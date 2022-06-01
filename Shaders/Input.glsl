@@ -138,7 +138,7 @@ float noisy_lines( float global_width, float depth_influence, float normal_influ
 vec3 tangent_uv_tangent( vec2 uv ){
     return compute_tangent( uv ).xyz;
 }
-vec3 tangent_radial( vec3 ){
+vec3 tangent_radial( vec3 vector ){
     return vec3( 0.0 );
 }
 

@@ -2,7 +2,7 @@ from bpy.props import *
 from .utils import *
 
 class MaltNodeTextureCoordinate( EssentialsNode ):
-    bl_idname = 'MaltNodeTexture Coordinate'
+    bl_idname = 'MaltNodeTextureCoordinate'
     bl_label = 'Texture Coordinate'
     menu_category = 'INPUT'
     default_width = 150
