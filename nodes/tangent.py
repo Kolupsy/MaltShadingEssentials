@@ -19,19 +19,27 @@ class MaltNodeTangent( EssentialsNode ):
         self.update_tree( )
     
     def update_socket_visibility( self ):
-        self.inputs[ 'uv' ].enabled = self.tangent_type == 'UV_TANGENT'
-        self.inputs[ 'vector' ].enabled = self.tangent_type == 'RADIAL'
+        t = self.tangent_type
+        self.inputs[ 'uv' ].enabled = t == 'UV_TANGENT'
+        self.inputs[ 'offset' ].enabled = t == 'RADIAL'
+        self.inputs[ 'rotation' ].enabled = t == 'RADIAL'
 
     def define_sockets( self ):
         return{
             'uv' : I( 'vec2', 'UV', default = 'UV[0]' ),
-            'vector' : I( 'vec3', 'Vector', default = ( 0.0, 0.0, 1.0 )),
+            'offset' : I( 'vec3', 'Offset', subtype = 'Vector' ),
+            'rotation' : I( 'vec3', 'Rotation', subtype = 'Vector' ),
             'tangent' : O( 'vec3', 'Tangent' ),
         }
     
     def get_function( self ):
-        f = 'precomp = TANGENT.xyz;\n'
-        f += 'uv_based = compute_tangent( uv ).xyz;\n'
-        return f
+        return{
+            'PRECOMP' : 'tangent = TANGENT;',
+            'UV_TANGENT' : 'tangent = tangent_uv_tangent( uv );',
+            'RADIAL' : 'tangent = tangent_radial( offset, rotation );',
+        }[ self.tangent_type ]
+    
+    def draw_buttons( self, context, layout ):
+        layout.prop( self, 'tangent_type', text = '' )
 
 NODES = [ MaltNodeTangent ]

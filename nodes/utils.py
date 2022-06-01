@@ -3,6 +3,7 @@ from ..custom_malt import CustomFunctionNode, MaltVariableIn as I, MaltVariableO
 
 class EssentialsNode( CustomFunctionNode ):
     menu_category = 'INPUT'
+    tooltip = ''
     default_width = None
 
     def malt_init( self ):
@@ -20,12 +21,12 @@ class EssentialsNode( CustomFunctionNode ):
     def get_category_data( cls ) -> dict:
         return {
             'OTHER' : ( 'Other', ( 0.25, 0.25, 0.25 ), 'NONE' ),
-            'INPUT' : ( 'Input', ( 0.15, 0.34, 0.3 ), 'INFO' ),
+            'INPUT' : ( 'Input', ( 0.15, 0.34, 0.3 ), 'FORWARD' ),
             'OUTPUT': ( 'Output', ( 0.38, 0.05, 0.2 ), 'RENDER_RESULT' ),
             'SHADER': ( 'Shader', ( 0.04, 0.29, 0.09 ), 'SHADING_RENDERED' ),
             'COLOR' : ( 'Color', ( 0.66, 0.5, 0.12 ), 'COLOR' ),
             'TEXTURE':( 'Texture', ( 0.57, 0.21, 0.05 ), 'TEXTURE' ),
-            'CONVERTOR':( 'Convertor', ( 0.2, .36, 0.66 ), 'CON_TRANSFORM' ),
+            'CONVERTOR':( 'Convertor', ( 0.13, 0.22, 0.4 ), 'CON_TRANSFORM' ),
             'VECTOR' : ( 'Vector', ( 0.15, 0.03, 0.41 ), 'CON_TRANSLIKE' ),
         }
 

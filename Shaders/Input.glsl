@@ -2,6 +2,7 @@
 #define SHADINGESSENTIALS_INPUT_GLSL
 
 #include "noise_functions.glsl"
+#include "Vector.glsl"
 
 vec3 incoming_vector( ){
     return normalize( POSITION - camera_position( ));
@@ -138,8 +139,19 @@ float noisy_lines( float global_width, float depth_influence, float normal_influ
 vec3 tangent_uv_tangent( vec2 uv ){
     return compute_tangent( uv ).xyz;
 }
-vec3 tangent_radial( vec3 vector ){
-    return vec3( 0.0 );
+
+
+/* META
+    @offset: subtype = Vector;
+    @rotation: subtype = Vector;
+*/
+vec3 tangent_radial( vec3 offset, vec3 rotation ){
+    vec3 co = object_coords( );
+    co = rotate_euler( co + offset, rotation );
+    co = vec3( - co.y, co.x, 0.0 );
+    co = transform_point( MODEL, co );
+    co = normalize( cross( co, NORMAL ));
+    return cross( NORMAL, co );
 }
 
 #endif
