@@ -27,15 +27,6 @@ int int_from_vec4( vec4 col ){
     return int( float_from_vec4( col ));
 }
 
-// FROM BOOL
-float float_from_bool( bool b ){
-    return float( b );
-}
-
-vec4 vec4_from_bool( bool b ){
-    return vec4( b, b, b, 1 );
-}
-
 // OTHER
 vec4 vec4_from_float_2( float f ){
     return vec4( f, f, f, 1 );

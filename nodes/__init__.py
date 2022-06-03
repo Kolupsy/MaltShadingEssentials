@@ -7,6 +7,8 @@ from nodeitems_utils import NodeCategory, NodeItem, register_node_categories, un
 _all_modules = glob.glob( '*.py', root_dir = dirname( __file__ ))
 __all__ = [ x.rsplit( '.py', 1 )[0] for x in _all_modules if not x.startswith( '__' )]
 
+PACKAGE_ID = 'MALTSHADINGESSENTIALS'
+
 from . import *
 
 modules = [ globals( )[ x ] for x in __all__ ]
@@ -47,10 +49,10 @@ def register_categories( register ):
             if not nodes:
                 continue
             node_items = [ NodeItem( x.bl_idname, settings = {'use_custom_color':repr(True), 'color':repr(data[1]), 'bl_icon':repr(data[2])}) for x in nodes ]
-            cat_list.append( EssentialsNodeCategory( identifier, f'[SE] {data[0]}', items = node_items ))
-        register_node_categories( 'SHADINGESSENTIALSMALT', cat_list )
+            cat_list.append( EssentialsNodeCategory( f'{PACKAGE_ID}_{identifier}', f'[SE] {data[0]}', items = node_items ))
+        register_node_categories( PACKAGE_ID, cat_list )
     else:
-        unregister_node_categories( 'SHADINGESSENTIALSMALT' )
+        unregister_node_categories( PACKAGE_ID )
 
 CLASSES = get_all_nodes( )
 REGISTER = [

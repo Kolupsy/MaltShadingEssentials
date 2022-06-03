@@ -38,12 +38,12 @@ class ShadingEssentialsPlugin( PipelinePlugin ):
     @classmethod
     def blendermalt_register( self ):
         print( f'register {__package__}' )
-        module_register( True )
+        module_register( True, debug = False )
     
     @classmethod
     def blendermalt_unregister( self ):
         print( f'unregister {__package__}' )
-        module_register( False )
+        module_register( False, debug = False )
         import sys
         for submodule_name in [ x for x in sorted( sys.modules.keys( )) if x.startswith( __name__ )]:
             del sys.modules[ submodule_name ]
