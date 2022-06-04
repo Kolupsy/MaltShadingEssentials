@@ -49,36 +49,17 @@ class MaltNodeGradientShading( BaseShaderNode ):
     bl_idname = 'MaltNodeGradientShading'
     bl_label = 'Gradient'
 
-    gradient_type : EnumProperty( name = 'Gradient Type', items = gradient_type_items, update = lambda s, c:s.update_gradient_type( ))
-
-    def update_gradient_type( self ):
-        self.update_socket_visibility( )
-        self.update_tree( )
-    
-    def update_socket_visibility( self ):
-        self.inputs[ 'roughness' ].enabled = self.gradient_type == 'SPECULAR'
-
     def define_sockets( self ):
         return{
-            'roughness' : I( 'float', 'Roughness', default = 0.8 ),
-            'normal' : I( 'vec3', 'Normal', subtype = 'Normal', default = 'NORMAL' ),
+            'position' : I( 'vec3', 'Position', default = 'POSITION' ),
+            'normal' : I( 'vec3', 'Normal', default = 'NORMAL' ),
             'light_group' : I( 'int', 'Group', default = 1 ),
             'shadows' : I( 'bool', 'Shadows', default = True ),
-            'self_shadows' : I( 'bool', 'Self Shadows', default = True ),
-            'gradient' : O( 'float', 'Gradient' )
+            'self_shadows' : I( 'bool', 'Self Shadows', default = 1 ),
+            'gradient' : O( 'vec3', 'Gradient' )
         }
     
     def get_function( self ):
-        f = {
-            'DIFFUSE':'gradient = rgb_to_hsv( diffuse_shading( POSITION, normal, light_group, shadows, self_shadows )).z;\n',
-            'SPECULAR':'gradient = rgb_to_hsv( specular_shading( POSITION, normal, roughness, light_group, shadows, self_shadows )).z;\n',
-        }[ self.gradient_type ]
-        return f
-    
-    def draw_buttons( self, context, layout ):
-        layout.prop( self, 'gradient_type', text = '' )
-    
-    def draw_label( self ):
-        return next( x[1] for x in gradient_type_items if self.gradient_type == x[0] ) + ' Gradient'
+        return 'gradient = diffuse_half_shading( position, normal, light_group, shadows, self_shadows );\n'
 
 NODES = [ MaltNodeDiffuseShader, MaltNodeSpecularShader, MaltNodeGradientShading ]

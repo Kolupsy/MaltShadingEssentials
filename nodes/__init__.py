@@ -46,6 +46,7 @@ def register_categories( register ):
         for identifier in category_data.keys( ):
             data = category_data[ identifier ]
             nodes = [ x for x in get_all_nodes( ) if x.menu_category == identifier ]
+            nodes.sort( key = lambda x: x.bl_label )
             if not nodes:
                 continue
             node_items = [ NodeItem( x.bl_idname, settings = {'use_custom_color':repr(True), 'color':repr(data[1]), 'bl_icon':repr(data[2])}) for x in nodes ]
