@@ -1,5 +1,12 @@
 # MaltShadingEssentials
-Plugin for BlenderMalt that enables an Eevee-like workflow
+Plugin for BlenderMalt that enables an Eevee-like workflow.
+
+**About**:
+This Plugin is currently not supporting any backwards-compatibility whatsoever. It is still in its very early stages.
+The goal is to always be up to date with Malt's Development version which means that it only supports that branch. Older versions of Malt may be too outdated.
+The Plugin is also dependent on the NPR Pipeline used by Malt by default. Some nodes use features from that pipeline so using another pipeline will brake a few nodes.
+
+Please send any bug reports related to the plugin to this github page and not to Malt's unless the bug is actually caused by Malt.
 
 **How to install:**
 
