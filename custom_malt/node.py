@@ -89,6 +89,9 @@ class CustomFunctionNode( MaltCustomNode ):
         return header
     
     def get_source_code( self, transpiler ):
+        func = self.get_function( )
+        if not type( func ) == str:
+            raise TypeError( 'CustomFunctionNode function has to be string type' )
         return self.get_function_wrapper( ).format( func = self.get_function( ))
 
     def draw_socket( self, context, layout, socket, text ):

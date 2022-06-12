@@ -1,17 +1,34 @@
 # Shader Nodes
 
 **Input:**
+- Ambient Occlusion / MaltNodeAmbientOcclusion : [nodes/ambient_occlusion.py]
 - Geometry / MaltNodeGeometry : [nodes/geometry.py]
 - Layer Weight / MaltNodeLayerWeight : [nodes/layer_weight.py]
+- Object Info / MaltNodeObjectInfo : [nodes/object_info.py]
 - Screen Space / MaltNodeScreenSpace : [nodes/screenspace.py]
 - Tangent / MaltNodeTangent : [nodes/tangent.py]
 - Texture Coordinate / MaltNodeTextureCoordinate : [nodes/texture_coordinate.py]
 - UV Map / MaltNodeUVMap : [nodes/texture_coordinate.py]
 
+**Output:**
+- Material Output TODO (not working) / MaltNodeMaterialOutput : [nodes/material_output.py]
+
+**Primitives:**
+- Float / MaltNodeFloat : [nodes/primitives.py]
+- Int / MaltNodeInt : [nodes/primitives.py]
+- Bool / MaltNodeBool : [nodes/primitives.py]
+- UV / MaltNodeUV : [nodes/primitives.py]
+- Vector / MaltNodeVector : [nodes/primitives.py]
+- Color / MaltNodeColor : [nodes/primitives.py]
+- Ramp / MaltNodeRamp : [nodes/primitives.py]
+- Texture / MaltNodeTexture : [nodes/primitives.py]
+
 **Shader:**
 - Diffuse / MaltNodeDiffuseShader : [nodes/base_shaders.py]
 - Specular / MaltNodeSpecularShader : [nodes/base_shaders.py]
 - Gradient / MaltNodeGradientShading : [nodes/base_shaders.py]
+- Emission / MaltNodeEmission : [nodes/base_shaders.py]
+- Toon Shader / MaltNodeToonShader : [nodes/toon_shader.py]
 
 **Color:**
 - Bright/Contrast / MaltNodeBrightContrast : [nodes/bright_contrast.py]

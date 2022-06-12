@@ -52,5 +52,16 @@ vec4 basic_pbr( vec4 base_color, float roughness, float metallic, vec3 normal ){
     vec4 result = mix( dielectric_color, glossy_color, metallic );
     return result;
 }
+/* META
+    @color: default = (0.8, 0.8, 0.8, 1.0 );
+    @brightness: default = 1.0;
+    @mask: default = 1.0;
+*/
+vec4 emission( vec4 color, float brightness, float mask ){
+    vec4 result = color;
+    result.xyz *= vec3( brightness );
+    result.a *= mask;
+    return result;
+}
 
 #endif

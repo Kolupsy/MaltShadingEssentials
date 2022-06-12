@@ -30,10 +30,12 @@ class ShadingEssentialsPlugin( PipelinePlugin ):
     
     @classmethod
     def register_graph_libraries( cls, graphs ):
-        library_path = os.path.join(os.path.dirname(__file__), 'Shaders' )
+        base_path = os.path.dirname(__file__)
         for graph in graphs.values():
             if graph.language == 'GLSL':
-                graph.add_library( library_path )
+                graph.add_library( os.path.join( base_path, 'ShaderFunctions' ))
+            if graph.language == 'Python':
+                graph.add_library( os.path.join( base_path, 'PipelineNodes' ))
 
     @classmethod
     def blendermalt_register( self ):

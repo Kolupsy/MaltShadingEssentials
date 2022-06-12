@@ -29,7 +29,6 @@ class MaltNodeTexNoise( EssentialsNode ):
 
     def update_socket_visibility( self ):
         visible_socket_name = socket_visibility[ self.dimensions ]
-        print( 'update socket vis', visible_socket_name )
         for i in [ x for x in self.inputs if x.name in socket_visibility.values( )]:
             i.enabled = i.name == visible_socket_name
     
@@ -55,7 +54,6 @@ class MaltNodeTexNoise( EssentialsNode ):
             '3D' : ( 'noise_texture3D', 'vector' ),
             '4D' : ( 'noise_texture4D', 'color' ),
         }[ self.dimensions ]
-        print( func_data )
         return f'{func_data[0]}( {func_data[1]}, scale, detail, roughness, value, result );'
     
     def draw_buttons(self, context, layout ):

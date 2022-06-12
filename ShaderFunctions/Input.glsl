@@ -71,6 +71,18 @@ void geometry_info(
         random_island = float( 0.0 );
     }
 
+void object_info( out vec3 location, out mat4 matrix, out float dist, out vec4 id, out vec4 random ){
+
+    location = model_position( );
+    matrix = MODEL;
+    dist = distance( location, transform_point( inverse( CAMERA ), vec3( 0 )));
+    vec4 crap_1;
+    vec4 crap_2;
+    vec4 crap_3;
+    unpack_8bit( object_original_id( ), id, crap_1, crap_2, crap_3 );
+    random = hash_vec4_to_vec4( id );
+}
+
 void camera_data( out vec3 view, out float depth, out float dist ){
     depth = abs( transform_point( CAMERA, POSITION ).z );
     vec3 cam_pos = camera_position( );
@@ -118,8 +130,8 @@ float line_world_scale( float scale ){
     @depth_influence: default = 0.8;
     @normal_influence: default = 0.5;
 */
-float tapered_lines( float global_width, float depth_influence, float normal_influence ){
-    return line_width( line_world_scale( global_width ), vec4( 1 ), depth_influence, -0.2, 0.1, 1, normal_influence, -0.2, 0.6, 1 );
+float tapered_lines( float global_width, float depth_influence, float normal_influence, vec4 id_bounds ){
+    return line_width( line_world_scale( global_width ), id_bounds, depth_influence, -0.2, 0.1, 1, normal_influence, -0.2, 0.6, 1 );
 }
 
 /* META
@@ -129,9 +141,9 @@ float tapered_lines( float global_width, float depth_influence, float normal_inf
     @noise_scale: default = 2.5;
     @bias: default = 0.7;
 */
-float noisy_lines( float global_width, float depth_influence, float normal_influence, float noise_scale, float bias ){
+float noisy_lines( float global_width, float depth_influence, float normal_influence, vec4 id_bounds, float noise_scale, float bias ){
 
-    float width = tapered_lines( global_width, depth_influence, normal_influence );
+    float width = tapered_lines( global_width, depth_influence, normal_influence, id_bounds );
     float noise = clamp( fractal_noise3D( POSITION * vec3( noise_scale ), 2, 0.5 ) - ( 1 - bias ), 0, 1 );
     return width * noise;
 }

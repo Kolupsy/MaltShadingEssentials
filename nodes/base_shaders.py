@@ -62,4 +62,19 @@ class MaltNodeGradientShading( BaseShaderNode ):
     def get_function( self ):
         return 'gradient = diffuse_half_shading( position, normal, light_group, shadows, self_shadows );\n'
 
-NODES = [ MaltNodeDiffuseShader, MaltNodeSpecularShader, MaltNodeGradientShading ]
+class MaltNodeEmission( BaseShaderNode ):
+    bl_idname = 'MaltNodeEmission'
+    bl_label = 'Emission'
+
+    def define_sockets( self ):
+        return{
+            'color' : I( 'vec4', 'Color', default = ( 0.8, 0.8, 0.8, 1 )),
+            'bright' : I( 'float', 'Brightness', default = 1.0 ),
+            'mask' : I( 'float', 'Mask', default = 'float( 1.0 )' ),
+            'result' : O( 'vec4', 'Color' )
+        }
+    
+    def get_function( self ):
+        return 'result = emission( color, bright, mask );'
+
+NODES = [ MaltNodeDiffuseShader, MaltNodeSpecularShader, MaltNodeGradientShading, MaltNodeEmission ]
