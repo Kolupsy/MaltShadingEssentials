@@ -1,29 +1,43 @@
 
-#ifdef PIXEL_SHADER
-#include "NPR_ScreenShader.glsl"
-#include "Node Utils/node_utils.glsl"
-// OUT_SCREEN_SHADER_COLOR
-layout( location = 0 ) out vec4 OUT_RESULT;
-uniform sampler2D color_texture;
-uniform float bloom_radius;
-uniform int samples;
-uniform float bloom_exponent;
-uniform float bloom_intensity;
+#include "Common.glsl"
 
-void SCREEN_SHADER(){
-
-    PIXEL_SETUP_INPUT();
-
-    // vec2 uv = screen_uv( );
-    // vec4 screen_color = sampler2D_sample( color_texture, uv );
-
-    // float blur_radius = render_resolution( ).y * bloom_radius;
-    // vec3 blurred_color = jitter_blur( color_texture, uv, blur_radius, 5.0, samples ).xyz;
-    // blurred_color.r = pow( blurred_color.r, bloom_exponent ) * bloom_intensity;
-    // blurred_color.g = pow( blurred_color.g, bloom_exponent ) * bloom_intensity;
-    // blurred_color.b = pow( blurred_color.b, bloom_exponent ) * bloom_intensity;
-    // screen_color.xyz += blurred_color;
-    // OUT_SCREEN_SHADER_COLOR = screen_color;
-    OUT_RESULT = vec4(1.0, 0.0, 0.0, 1.0 );
+#ifdef VERTEX_SHADER
+void main()
+{
+    DEFAULT_SCREEN_VERTEX_SHADER();
 }
-#endif //PIXEL_SHADER
+#endif
+
+#ifdef PIXEL_SHADER
+
+uniform sampler2D color_texture;
+
+uniform vec3 bloom_settings; // x = bloom exponent y = bloom intensity z = bloom radius
+uniform int samples;
+
+layout (location = 0) out vec4 RESULT;
+
+#include "Filters/Line.glsl"
+#include "Filters/Blur.glsl"
+#include "Node Utils/common.glsl"
+
+void main()
+{
+    PIXEL_SETUP_INPUT();
+    vec2 uv = UV[0];
+    float bloom_exponent = bloom_settings.x;
+    float bloom_intensity = bloom_settings.y;
+    float bloom_radius = bloom_settings.z;
+    vec4 screen_color = texture( color_texture, uv );
+    vec3 blurred_color = jitter_blur( color_texture, uv, render_resolution( ).y * bloom_radius, 5.0, samples ).xyz;
+    
+
+    blurred_color.r = pow( blurred_color.r, bloom_exponent ) * bloom_intensity;
+    blurred_color.g = pow( blurred_color.g, bloom_exponent ) * bloom_intensity;
+    blurred_color.b = pow( blurred_color.b, bloom_exponent ) * bloom_intensity;
+    screen_color.xyz += blurred_color;
+    
+    RESULT = screen_color;
+}
+
+#endif

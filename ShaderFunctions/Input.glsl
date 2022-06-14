@@ -67,7 +67,11 @@ void geometry_info(
         incoming = incoming_vector( );
         parametric = vec2( 0.0 );
         backfacing = 1.0 - float(is_front_facing( ));
+        #ifdef NPR_FILTERS_ACTIVE
         _curvature = curvature( );
+        #else
+        _curvature = 0.0;
+        #endif
         random_island = float( 0.0 );
     }
 
@@ -125,6 +129,7 @@ float line_world_scale( float scale ){
     return float_divide( 1, float_pow( pixel_world_size( ), 0.5 )) * scale;
 }
 
+#ifdef NPR_FILTERS_ACTIVE
 /* META
     @global_width: default = 0.3;
     @depth_influence: default = 0.8;
@@ -147,6 +152,7 @@ float noisy_lines( float global_width, float depth_influence, float normal_influ
     float noise = clamp( fractal_noise3D( POSITION * vec3( noise_scale ), 2, 0.5 ) - ( 1 - bias ), 0, 1 );
     return width * noise;
 }
+#endif
 
 vec3 tangent_uv_tangent( vec2 uv ){
     return compute_tangent( uv ).xyz;

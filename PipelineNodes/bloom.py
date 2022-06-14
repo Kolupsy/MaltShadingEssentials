@@ -10,7 +10,7 @@ _SHADER = None
 
 BLOOMPATH = str( pathlib.Path( __file__ ).parent.parent.joinpath( 'Shaders', 'Bloom.glsl' ))
 
-class CustomBloomPass( PipelineNode ):
+class EssentialsBloomPass( PipelineNode ):
 
     def __init__( self, pipeline ):
         PipelineNode.__init__( self, pipeline )
@@ -18,23 +18,25 @@ class CustomBloomPass( PipelineNode ):
     
     @classmethod
     def reflect_inputs( cls ):
-        inputs = {}
-        inputs[ 'Color' ] = Parameter( '', Type.TEXTURE )
-        return inputs
+        return {
+            'Color' : Parameter( '', Type.TEXTURE ),
+            'Radius' : Parameter( 0.5, Type.FLOAT ),
+            'Samples' : Parameter( 64, Type.INT ),
+            'Exponent' : Parameter( 2.0, Type.FLOAT ),
+            'Intensity' : Parameter( 5.0, Type.FLOAT ),
+        }
     
     @classmethod
     def reflect_outputs( cls ):
-        outputs = {}
-        outputs[ 'Color' ] = Parameter( '', Type.TEXTURE )
-        return outputs
-    
-    @staticmethod
-    def get_pass_type( ):
-        return 'Screen.SCREEN_SHADER'
+        return {
+            'Color' : Parameter( '', Type.TEXTURE )
+        }
     
     def setup_render_targets( self, resolution ):
-        self.t_color = Texture( resolution, GL_RGBA16F )
-        self.fbo_color = RenderTarget([ self.t_color ])
+        self.resolution = resolution
+        self.texture_targets = {}
+        self.texture_targets[ 'COLOR' ] = Texture( resolution, GL_RGBA16F )
+        self.render_target = RenderTarget([*self.texture_targets.values( )])
     
     def execute( self, parameters ):
         inputs = parameters[ 'IN' ]
@@ -42,18 +44,25 @@ class CustomBloomPass( PipelineNode ):
 
         if self.pipeline.resolution != self.resolution:
             self.setup_render_targets( self.pipeline.resolution )
-            self.resolution = self.pipeline.resolution
-            self.texture_targets = {}
-            self.texture_targets[ 'Color' ] = Texture( self.pipeline.resolution, GL_RGBA16F )
-            self.render_target = RenderTarget([*self.texture_targets.values( )])
         
         global _SHADER
         if _SHADER is None:
-            _SHADER = self.pipeline.compile_shader_from_source( f'#include "{BLOOMPATH}"' )
-            _SHADER.textures[ 'color_texture' ] = inputs[ 'Color' ]
-            self.pipeline.common_buffer.shader_callback( _SHADER )
-            self.pipeline.draw_screen_pass( _SHADER, self.fbo_color )
+            self.compile_shader( )
+            print( 'UNIFORM KEYS:', _SHADER.uniforms.keys( ))
+        
+        _SHADER.textures[ 'color_texture' ] = inputs[ 'Color' ]
+        _SHADER.uniforms[ 'bloom_settings' ].set_value(( inputs['Exponent'], inputs['Intensity'], inputs['Radius']))
+        _SHADER.uniforms[ 'samples' ].set_value( inputs['Samples'])
+        self.pipeline.common_buffer.shader_callback( _SHADER )
+        self.pipeline.draw_screen_pass( _SHADER, self.render_target )
             
-            outputs[ 'Color' ] = self.texture_targets[ 'Color' ]
+        outputs[ 'Color' ] = self.texture_targets[ 'COLOR' ]
 
-NODE = CustomBloomPass
+    def compile_shader_from_source( self, source, include_paths = [], defines = []):
+        return self.pipeline.compile_shader_from_source( source = source, include_paths = include_paths, defines = defines )
+
+    def compile_shader( self ):
+        global _SHADER
+        _SHADER = self.compile_shader_from_source( f'#include "{BLOOMPATH}"' )
+
+NODE = EssentialsBloomPass
