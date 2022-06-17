@@ -1,6 +1,8 @@
 #ifndef SHADINGESSENTIALS_MATH_GLSL
 #define SHADINGESSENTIALS_MATH_GLSL
 
+#include "Node Utils/float.glsl"
+
 void math_add(float a, float b, float c, out float result)
 {
   result = a + b;

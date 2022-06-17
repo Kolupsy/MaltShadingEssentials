@@ -3,6 +3,7 @@
 
 #include "noise_functions.glsl"
 #include "Vector.glsl"
+#include "Common/Transform.glsl"
 
 vec3 incoming_vector( ){
     return normalize( POSITION - camera_position( ));
@@ -94,9 +95,15 @@ void camera_data( out vec3 view, out float depth, out float dist ){
     view = camera_mapping( );
 }
 
-void screenspace_info( out vec2 flat_uv, out vec2 projected, out vec2 matcap, out vec2 screen ){
+void screenspace_info( out vec2 flat_uv, out vec2 projected, out vec2 matcap, out vec2 screen, bool is_screen_shader ){
     vec3 camera = camera_mapping( );
-    flat_uv = vec2( camera.x / camera.z, camera.y / camera.z );
+    if( is_screen_shader ){
+        vec2 res = render_resolution( );
+        float aspect = res.x / res.y;
+        flat_uv = ( screen_uv( ) - vec2( 0.5 )) * vec2( aspect, 1.0 );
+    }else{
+        flat_uv = vec2( camera.x / camera.z, camera.y / camera.z );
+    }
     projected = camera.xy;
     matcap = matcap_uv( NORMAL );
     screen = screen_uv( );
@@ -129,7 +136,6 @@ float line_world_scale( float scale ){
     return float_divide( 1, float_pow( pixel_world_size( ), 0.5 )) * scale;
 }
 
-#ifdef NPR_FILTERS_ACTIVE
 /* META
     @global_width: default = 0.3;
     @depth_influence: default = 0.8;
@@ -152,7 +158,6 @@ float noisy_lines( float global_width, float depth_influence, float normal_influ
     float noise = clamp( fractal_noise3D( POSITION * vec3( noise_scale ), 2, 0.5 ) - ( 1 - bias ), 0, 1 );
     return width * noise;
 }
-#endif
 
 vec3 tangent_uv_tangent( vec2 uv ){
     return compute_tangent( uv ).xyz;
@@ -170,6 +175,11 @@ vec3 tangent_radial( vec3 offset, vec3 rotation ){
     co = transform_point( MODEL, co );
     co = normalize( cross( co, NORMAL ));
     return cross( NORMAL, co );
+}
+
+float get_scene_z( sampler2D normal_depth, vec2 uv ){
+    float d = texture( normal_depth, uv ).w;
+    return 0 - depth_to_z( d );
 }
 
 #endif

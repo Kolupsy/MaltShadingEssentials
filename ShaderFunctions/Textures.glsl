@@ -4,6 +4,9 @@
 #include "noise_functions.glsl"
 #include "Input.glsl"
 #include "Math.glsl"
+#include "Node Utils/vec2.glsl"
+#include "Node Utils/vec3.glsl"
+#include "Node Utils/vec4.glsl"
 
 // PERLIN NOISE =================================================================================
 

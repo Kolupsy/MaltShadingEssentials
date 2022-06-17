@@ -41,4 +41,15 @@ vec3 vector_mapping_normal( vec3 vector, vec3 rotation, vec3 scale ){
     return normalize( vector_mapping_vector( vector, rotation, scale ));
 }
 
+float vector_angle_2D( vec2 vector ){
+    return atan( vector.y, vector.x );
+
+}
+float vector_angle_2D_continuous( vec2 vector ){
+    float tang = vector_angle_2D( vector );
+    return ( tang < 0.0 )
+            ? PI * 2.0 + tang 
+            : tang;
+}
+
 #endif
