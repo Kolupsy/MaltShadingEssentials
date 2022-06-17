@@ -77,4 +77,55 @@ class MaltNodeEmission( BaseShaderNode ):
     def get_function( self ):
         return 'result = emission( color, bright, mask );'
 
+from typing import Any
+
+class MaltNodeBloomPass( EssentialsPipelineNode ):
+    bl_idname = 'MaltNodeBloomPass'
+    bl_label = 'Bloom Pass'
+    menu_category = 'SHADER'
+
+    SHADER = None
+
+    @classmethod
+    def static_inputs(cls) -> dict[tuple[str, Any]]:
+        return {
+            'Color' : ( 'sampler2D', '' ),
+        }
+    @classmethod
+    def static_outputs(cls) -> dict[tuple[str, Any]]:
+        return {
+            'Color' : ( 'sampler2D', '' ),
+        }
+    
+    def get_texture_targets(self) -> list[str]:
+        return [ 'OUT_COLOR' ]
+    
+    def render( self, inputs: dict, outputs: dict ):
+        
+        if not self.SHADER:
+            self.SHADER = self.compile_shader( self.get_shader_code( ))
+        outputs[ 'Color' ] = self.texture_targets[ 'OUT_COLOR' ]
+    
+    def get_shader_code( self ):
+        return '''
+#include "Common.glsl"
+
+#ifdef VERTEX_SHADER
+void main()
+{
+    DEFAULT_SCREEN_VERTEX_SHADER();
+}
+#endif
+
+#ifdef PIXEL_SHADER
+layout (location = 0) out vec4 OUTPUT1;
+void main()
+{
+    PIXEL_SETUP_INPUT();
+
+    OUTPUT1 = vec4(0.0,0.1,0.1,1);
+}
+#endif
+'''
+
 NODES = [ MaltNodeDiffuseShader, MaltNodeSpecularShader, MaltNodeGradientShading, MaltNodeEmission ]

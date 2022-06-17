@@ -1,7 +1,9 @@
 import bpy
-from ..custom_malt import CustomFunctionNode, MaltVariableIn as I, MaltVariableOut as O, enum_from_rna
 
-class EssentialsNode( CustomFunctionNode ):
+from ..custom_malt import CustomFunctionNode, CustomPipelineNode, MaltVariableIn as I, MaltVariableOut as O, enum_from_rna
+
+class EssentialsTemplate( ):
+
     menu_category = 'INPUT'
     tooltip = ''
     default_width = None
@@ -40,10 +42,16 @@ class EssentialsNode( CustomFunctionNode ):
         else:
             return category_data[ cls.menu_category ]
 
-def malt_update( self:EssentialsNode, context ):
+def malt_update( self:EssentialsTemplate, context ):
     self.update_tree( )
 
-def socket_update( self:EssentialsNode, context ):
+def socket_update( self:EssentialsTemplate, context ):
     self.update_socket_visibility( )
 
-__all__ = [ 'EssentialsNode', 'I', 'O', 'bpy', 'enum_from_rna', 'malt_update', 'socket_update' ]
+class EssentialsNode( EssentialsTemplate, CustomFunctionNode ):
+    pass
+
+class EssentialsPipelineNode( EssentialsTemplate, CustomPipelineNode ):
+    pass
+
+__all__ = [ 'EssentialsNode', 'EssentialsPipelineNode', 'I', 'O', 'bpy', 'enum_from_rna', 'malt_update', 'socket_update' ]

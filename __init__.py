@@ -6,7 +6,8 @@ def get_modules( ):
     all_modules = glob.glob( '*.py', root_dir = os.path.dirname( __file__ ))
     __all__ = [ x.rsplit( '.py', 1 ) for x in all_modules if not x.startswith( '__' )]
     from . import nodes
-    return [ nodes ]
+    from . import driver_registry
+    return [ nodes, driver_registry ]
 
 def module_register( register, debug = False ):
     import bpy

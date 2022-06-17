@@ -16,7 +16,7 @@ class MaltNodeScreenSpace( EssentialsNode ):
         }
     
     def get_function( self ):
-        f = 'screenspace_info( flat_uv, projected, matcap, screen );\n'
+        f = f'screenspace_info( flat_uv, projected, matcap, screen, {"true" if self.id_data.graph_type == "Screen" else "false"} );\n'
         f += 'normal_space = matcap * vec2(2) - vec2( 1 );'
         return f
     
