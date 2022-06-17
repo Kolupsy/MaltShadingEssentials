@@ -8,9 +8,9 @@ import pathlib
 
 _SHADER = None
 
-BLOOMPATH = str( pathlib.Path( __file__ ).parent.parent.joinpath( 'Shaders', 'Bloom.glsl' ))
+SHADERPATH = str( pathlib.Path( __file__ ).parent.parent.joinpath( 'Shaders', 'LensFlare.glsl' ))
 
-class EssentialsBloom( PipelineNode ):
+class EssentialsLensFlare( PipelineNode ):
 
     def __init__( self, pipeline ):
         PipelineNode.__init__( self, pipeline )
@@ -20,10 +20,9 @@ class EssentialsBloom( PipelineNode ):
     def reflect_inputs( cls ):
         return {
             'Color' : Parameter( '', Type.TEXTURE ),
-            'Radius' : Parameter( 0.5, Type.FLOAT ),
-            'Samples' : Parameter( 64, Type.INT ),
-            'Exponent' : Parameter( 2.0, Type.FLOAT ),
-            'Intensity' : Parameter( 5.0, Type.FLOAT ),
+            'Rot X' : Parameter( 0.0, Type.FLOAT ),
+            'Rot Y' : Parameter( 0.0, Type.FLOAT ),
+            'Rot Z' : Parameter( 0.0, Type.FLOAT ),
         }
     
     @classmethod
@@ -50,8 +49,7 @@ class EssentialsBloom( PipelineNode ):
             self.compile_shader( )
         
         _SHADER.textures[ 'color_texture' ] = inputs[ 'Color' ]
-        _SHADER.uniforms[ 'bloom_settings' ].set_value(( inputs['Exponent'], inputs['Intensity'], inputs['Radius']))
-        _SHADER.uniforms[ 'samples' ].set_value( inputs['Samples'])
+        _SHADER.uniforms[ 'euler_rot' ].set_value(( inputs[ 'Rot X' ], inputs[ 'Rot Y' ], inputs[ 'Rot Z']))
         self.pipeline.common_buffer.shader_callback( _SHADER )
         self.pipeline.draw_screen_pass( _SHADER, self.render_target )
             
@@ -62,6 +60,6 @@ class EssentialsBloom( PipelineNode ):
 
     def compile_shader( self ):
         global _SHADER
-        _SHADER = self.compile_shader_from_source( f'#include "{BLOOMPATH}"' )
+        _SHADER = self.compile_shader_from_source( f'#include "{SHADERPATH}"' )
 
-NODE = EssentialsBloom
+NODE = EssentialsLensFlare

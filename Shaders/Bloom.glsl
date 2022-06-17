@@ -1,5 +1,7 @@
 
 #include "Common.glsl"
+#include "Filters/Blur.glsl"
+#include "Node Utils/common.glsl"
 
 #ifdef VERTEX_SHADER
 void main()
@@ -16,10 +18,6 @@ uniform vec3 bloom_settings; // x = bloom exponent y = bloom intensity z = bloom
 uniform int samples;
 
 layout (location = 0) out vec4 RESULT;
-
-#include "Filters/Line.glsl"
-#include "Filters/Blur.glsl"
-#include "Node Utils/common.glsl"
 
 void main()
 {
