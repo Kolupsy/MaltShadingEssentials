@@ -1,6 +1,7 @@
 #ifndef SHADINGESSENTIALS_COLOR_GLSL
 #define SHADINGESSENTIALS_COLOR_GLSL
 
+/* META @meta: internal=true; */
 void hue_saturation_value( float h, float s, float v, float fac, bool invert, vec4 color, out vec4 result ){
     vec3 hsv = rgb_to_hsv( color.rgb );
     hsv.x = fract( hsv.x + h + 0.5 );
@@ -10,6 +11,7 @@ void hue_saturation_value( float h, float s, float v, float fac, bool invert, ve
     result = mix( color, result, abs( float( invert ) - fac ));
 }
 
+/* META @meta: internal=true; */
 vec4 brightness_contrast( vec4 col, float brightness, float contrast ){
     float a = 1.0 + contrast;
     float b = brightness - contrast * 0.5;
@@ -21,6 +23,7 @@ vec4 brightness_contrast( vec4 col, float brightness, float contrast ){
     return result;
 }
 
+/* META @meta: internal=true; */
 vec4 gamma_correction( vec4 col, float gamma ){
     vec4 result = col;
 
@@ -36,6 +39,7 @@ vec4 gamma_correction( vec4 col, float gamma ){
     return result;
 }
 
+/* META @meta: internal=true; */
 vec4 color_invert( vec4 col, float fac ){
     vec4 result;
     result.r = 1 - col.r;

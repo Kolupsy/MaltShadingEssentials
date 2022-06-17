@@ -1,6 +1,7 @@
 #ifndef SHADINGESSENTIALS_CONVERTOR_GLSL
 #define SHADINGESSENTIALS_CONVERTOR_GLSL
 
+/* META @meta: internal=true; */
 void float_map_range_linear( float value, float from_min, float from_max, float to_min, float to_max, int steps, out float result ){
     if( from_max != from_min ){
         result = ( value - from_min ) * (( to_max - to_min )/( from_max - from_min )) + to_min;
@@ -9,6 +10,7 @@ void float_map_range_linear( float value, float from_min, float from_max, float 
         result = 0.0;
     }
 }
+/* META @meta: internal=true; */
 void float_map_range_stepped( float value, float from_min, float from_max, float to_min, float to_max, int steps, out float result ){
   if ( from_max != from_min ){
     float factor = ( value - from_min ) / ( from_max - from_min );
@@ -19,6 +21,7 @@ void float_map_range_stepped( float value, float from_min, float from_max, float
     result = 0.0;
   }
 }
+/* META @meta: internal=true; */
 void float_map_range_smoothstep( float value, float from_min, float from_max, float to_min, float to_max, int steps, out float result ){
     if ( from_max != from_min ) {
         float factor = ( from_min > from_max ) ? 1.0 - smoothstep( from_max, from_min, value ) : smoothstep(from_min, from_max, value );
@@ -29,6 +32,7 @@ void float_map_range_smoothstep( float value, float from_min, float from_max, fl
     }
 }
 
+/* META @meta: internal=true; */
 void float_map_range_smootherstep( float value, float from_min, float from_max, float to_min, float to_max, int steps, out float result ){
     if ( from_max != from_min ) {
         float x;

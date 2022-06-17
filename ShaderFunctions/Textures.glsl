@@ -10,6 +10,7 @@
 
 // PERLIN NOISE =================================================================================
 
+/* META @meta: internal=true; */
 void noise_texture1D( float w, float scale, float detail, float roughness, out float value, out vec4 color ){
 
     float p = w * scale;
@@ -21,6 +22,7 @@ void noise_texture1D( float w, float scale, float detail, float roughness, out f
         fractal_noise1D( p + random_float_offset( 3.0 ), detail, roughness ));
 }
 
+/* META @meta: internal=true; */
 void noise_texture2D( vec2 uv, float scale, float detail, float roughness, out float value, out vec4 color ){
     
     vec2 p = uv * scale;
@@ -32,6 +34,7 @@ void noise_texture2D( vec2 uv, float scale, float detail, float roughness, out f
         fractal_noise2D( p + random_vec2_offset( 4.0 ), detail, roughness ));
 }
 
+/* META @meta: internal=true; */
 void noise_texture3D( vec3 vector, float scale, float detail, float roughness, out float value, out vec4 color ){
 
     vec3 p = vector * scale;
@@ -43,6 +46,7 @@ void noise_texture3D( vec3 vector, float scale, float detail, float roughness, o
         fractal_noise3D( p + random_vec3_offset( 5.0 ), detail, roughness ));
 }
 
+/* META @meta: internal=true; */
 void noise_texture4D( vec4 vector, float scale, float detail, float roughness, out float value, out vec4 color ){
 
     vec4 p = vector * scale;
@@ -56,6 +60,7 @@ void noise_texture4D( vec4 vector, float scale, float detail, float roughness, o
 
 // CELL NOISE =================================================================================
 
+/* META @meta: internal=true; */
 void voronoi_texture_f1_1d( 
                             float w,
                             float scale,
@@ -93,6 +98,7 @@ void voronoi_texture_f1_1d(
   outW = float_divide(targetPosition + cellPosition, scale);
 }
 
+/* META @meta: internal=true; */
 void voronoi_texture_smooth_f1_1d(
                                     float w,
                                     float scale,
@@ -133,6 +139,7 @@ void voronoi_texture_smooth_f1_1d(
   outW = float_divide(cellPosition + smoothPosition, scale);
 }
 
+/* META @meta: internal=true; */
 void voronoi_texture_f2_1d(
                             float w,
                             float scale,
@@ -180,6 +187,7 @@ void voronoi_texture_f2_1d(
   outW = float_divide(positionF2 + cellPosition, scale);
 }
 
+/* META @meta: internal=true; */
 void voronoi_texture_distance_to_edge_1d(
                                             float w,
                                             float scale,
@@ -208,6 +216,7 @@ void voronoi_texture_distance_to_edge_1d(
   outDistance = min(distanceToMidLeft, distanceToMidRight);
 }
 
+/* META @meta: internal=true; */
 void voronoi_texture_n_sphere_radius_1d(
                                             float w,
                                             float scale,
@@ -259,6 +268,7 @@ void voronoi_texture_n_sphere_radius_1d(
 
 // VORONOI 2D
 
+/* META @meta: internal=true; */
 void voronoi_texture_f1_2d( vec2 coord,
                             float scale,
                             float smoothness,
@@ -296,6 +306,7 @@ void voronoi_texture_f1_2d( vec2 coord,
   outPosition = vec3(vec2_divide(targetPosition + cellPosition, vec2(scale)), 0.0);
 }
 
+/* META @meta: internal=true; */
 void voronoi_texture_smooth_f1_2d(  vec2 coord,
                                     float scale,
                                     float smoothness,
@@ -337,6 +348,7 @@ void voronoi_texture_smooth_f1_2d(  vec2 coord,
   outPosition = vec3(vec2_divide(cellPosition + smoothPosition, vec2(scale)), 0.0);
 }
 
+/* META @meta: internal=true; */
 void voronoi_texture_f2_2d( vec2 coord,
                             float scale,
                             float smoothness,
@@ -385,6 +397,7 @@ void voronoi_texture_f2_2d( vec2 coord,
   outPosition = vec3(vec2_divide(positionF2 + cellPosition, vec2(scale)), 0.0);
 }
 
+/* META @meta: internal=true; */
 void voronoi_texture_distance_to_edge_2d(   vec2 coord,
                                             float scale,
                                             float smoothness,
@@ -434,6 +447,7 @@ void voronoi_texture_distance_to_edge_2d(   vec2 coord,
   outDistance = minDistance;
 }
 
+/* META @meta: internal=true; */
 void voronoi_texture_n_sphere_radius_2d(vec2 coord,
                                         float scale,
                                         float smoothness,
@@ -488,6 +502,7 @@ void voronoi_texture_n_sphere_radius_2d(vec2 coord,
 
 // 3D VORONOI
 
+/* META @meta: internal=true; */
 void voronoi_texture_f1_3d(vec3 coord,
                             float scale,
                             float smoothness,
@@ -528,6 +543,7 @@ void voronoi_texture_f1_3d(vec3 coord,
   outPosition = vec3_divide(targetPosition + cellPosition, vec3(scale));
 }
 
+/* META @meta: internal=true; */
 void voronoi_texture_smooth_f1_3d(vec3 coord,
                                    float scale,
                                    float smoothness,
@@ -573,6 +589,7 @@ void voronoi_texture_smooth_f1_3d(vec3 coord,
   outPosition = vec3_divide(cellPosition + smoothPosition, vec3(scale));
 }
 
+/* META @meta: internal=true; */
 void voronoi_texture_f2_3d(vec3 coord,
                             float scale,
                             float smoothness,
@@ -624,6 +641,7 @@ void voronoi_texture_f2_3d(vec3 coord,
   outPosition = vec3_divide(positionF2 + cellPosition, vec3(scale));
 }
 
+/* META @meta: internal=true; */
 void voronoi_texture_distance_to_edge_3d(vec3 coord,
                                           float scale,
                                           float smoothness,
@@ -679,6 +697,7 @@ void voronoi_texture_distance_to_edge_3d(vec3 coord,
   outDistance = minDistance;
 }
 
+/* META @meta: internal=true; */
 void voronoi_texture_n_sphere_radius_3d(vec3 coord,
                                          float scale,
                                          float smoothness,
@@ -739,6 +758,7 @@ void voronoi_texture_n_sphere_radius_3d(vec3 coord,
 
 // 4D VORONOI
 
+/* META @meta: internal=true; */
 void voronoi_texture_f1_4d(vec4 coord,
                             float scale,
                             float smoothness,
@@ -783,6 +803,7 @@ void voronoi_texture_f1_4d(vec4 coord,
   outW = p.w;
 }
 
+/* META @meta: internal=true; */
 void voronoi_texture_smooth_f1_4d(vec4 coord,
                                    float scale,
                                    float smoothness,
@@ -832,6 +853,7 @@ void voronoi_texture_smooth_f1_4d(vec4 coord,
   outW = p.w;
 }
 
+/* META @meta: internal=true; */
 void voronoi_texture_f2_4d(vec4 coord,
                             float scale,
                             float smoothness,
@@ -887,6 +909,7 @@ void voronoi_texture_f2_4d(vec4 coord,
   outW = p.w;
 }
 
+/* META @meta: internal=true; */
 void voronoi_texture_distance_to_edge_4d(vec4 coord,
                                           float scale,
                                           float smoothness,
@@ -946,6 +969,7 @@ void voronoi_texture_distance_to_edge_4d(vec4 coord,
   outDistance = minDistance;
 }
 
+/* META @meta: internal=true; */
 void voronoi_texture_n_sphere_radius_4d(vec4 coord,
                                          float scale,
                                          float smoothness,
@@ -1008,12 +1032,14 @@ void voronoi_texture_n_sphere_radius_4d(vec4 coord,
   outRadius = distance(closestPointToClosestPoint, closestPoint) / 2.0;
 }
 
+/* META @meta: internal=true; */
 vec4 sampler2D_sample_environment( sampler2D texture, vec3 vector ){
     vec2 uv = hdri_uv( vector );
     return sampler2D_sample_nearest( texture, uv );
 }
 
 /* META
+    @meta: internal=true; 
     @normal: default = NORMAL;
     @roughness: default = 0.0;
     @samples: default = 1;
@@ -1031,6 +1057,7 @@ vec4 sampler2D_sample_environment_blurry( sampler2D texture, vec3 normal, float 
     return result / samples;
 }
 
+/* META @meta: internal=true; */
 vec4 texture_flow( sampler2D texture, vec2 uv, vec2 flow, float progression, int samples ){
   vec4 result;
   float fraction = 1.0 / float( samples );
@@ -1047,14 +1074,17 @@ vec4 texture_flow( sampler2D texture, vec2 uv, vec2 flow, float progression, int
   return result;
 }
 
+/* META @meta: internal=true; */
 float texture_wave_sine( float mapping, float scale, float phase ){
   mapping = mapping * scale * PI * 2 + phase;
   return sin( mapping - PI / 2 ) * 0.5 + 0.5;
 }
+/* META @meta: internal=true; */
 float texture_wave_saw( float mapping, float scale, float phase ){
   mapping = mapping * scale + phase;
   return fract( mapping );
 }
+/* META @meta: internal=true; */
 float texture_wave_triangle( float mapping, float scale, float phase ){
   mapping = mapping * scale + phase;
   float result = fract( mapping ) - 0.5;
@@ -1062,47 +1092,58 @@ float texture_wave_triangle( float mapping, float scale, float phase ){
   return result;
 }
 
+/* META @meta: internal=true; */
 float texture_gradient_linear( float mapping ){
   return clamp( mapping, 0.0, 1.0 );
 }
+/* META @meta: internal=true; */
 float texture_gradient_quadratic( float mapping ){
   return clamp( mapping * mapping, 0.0, 1.0 );
 }
+/* META @meta: internal=true; */
 float texture_gradient_easing( float mapping ){
   float r = clamp( mapping, 0.0, 1.0 );
   float t = r * r;
   return ( 3.0 * t - 2.0 * t * r );
 }
+/* META @meta: internal=true; */
 float texture_gradient_diagonal( vec2 uv ){
   return ( uv.x + uv.y ) * 0.5;
 }
+/* META @meta: internal=true; */
 float texture_gradient_spherical( vec3 vector ){
   float r = max( 0.9999999 - sqrt( vector.x * vector.x + vector.y * vector.y + vector.z + vector.z ), 0.0 );
   return r;
 }
+/* META @meta: internal=true; */
 float texture_gradient_quadratic_sphere( vec3 vector ){
   float r = max( 0.9999999 - sqrt( vector.x * vector.x + vector.y * vector.y + vector.z + vector.z ), 0.0 );
   return r * r;
 }
+/* META @meta: internal=true; */
 float texture_gradient_radial( vec2 uv ){
   return atan( uv.y, uv.x ) / ( PI * 2 ) + 0.5;
 }
 
+/* META @meta: internal=true; */
 vec4 texture_white_noise_1d( float w ){
   vec3 vector = hash_float_to_vec3( w );
   float value = hash_vec2_to_float( vec2( w, 1.0 ));
   return vec4( vector, value );
 }
+/* META @meta: internal=true; */
 vec4 texture_white_noise_2d( vec2 uv ){
   vec3 vector = hash_vec2_to_vec3( uv );
   float value = hash_vec3_to_float( vec3( uv, 2.0 ));
   return vec4( vector, value );
 }
+/* META @meta: internal=true; */
 vec4 texture_white_noise_3d( vec3 vector ){
   vec3 out_vector =  hash_vec3_to_vec3( vector );
   float value = hash_vec4_to_float( vec4( vector, 3.0 ));
   return vec4( out_vector, value );
 }
+/* META @meta: internal=true; */
 vec4 texture_white_noise_4d( vec4 color ){
   return hash_vec4_to_vec4( color );
 }

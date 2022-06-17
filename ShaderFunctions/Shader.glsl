@@ -4,6 +4,7 @@
 #include "Input.glsl"
 
 /* META
+    @meta: internal=true;
     @base_color: default = (0.8, 0.8, 0.8, 1.0 );
     @normal : subtype = Normal; default = NORMAL;
     @light_group : default = 1;
@@ -16,6 +17,7 @@ vec4 diffuse_shader( vec4 base_color, vec3 normal, int light_group, bool shadows
 }
 
 /* META
+    @meta: internal=true;
     @base_color: default = (0.8, 0.8, 0.8, 1.0 );
     @roughness : default = 0.3;
     @normal : subtype = Normal; default = NORMAL;
@@ -28,6 +30,7 @@ vec4 specular_shader( vec4 base_color, float roughness, vec3 normal, int light_g
 }
 
 /*  META
+    @meta: internal=true;
     @base_color: default = ( 0.8, 0.8, 0.8, 1.0 );
     @roughness: default = 0.8;
     @normal: subtype=Normal; default=NORMAL;
@@ -53,6 +56,7 @@ vec4 basic_pbr( vec4 base_color, float roughness, float metallic, vec3 normal ){
     return result;
 }
 /* META
+    @meta: internal=true;
     @color: default = (0.8, 0.8, 0.8, 1.0 );
     @brightness: default = 1.0;
     @mask: default = 1.0;

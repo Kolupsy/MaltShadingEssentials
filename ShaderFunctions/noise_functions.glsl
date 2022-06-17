@@ -47,6 +47,7 @@
     c -= rot(b, 24); \
   }
 
+/* META @meta: internal=true; */
 uint hash_uint(uint kx)
 {
   uint a, b, c;
@@ -58,6 +59,7 @@ uint hash_uint(uint kx)
   return c;
 }
 
+/* META @meta: internal=true; */
 uint hash_uint2(uint kx, uint ky)
 {
   uint a, b, c;
@@ -70,6 +72,7 @@ uint hash_uint2(uint kx, uint ky)
   return c;
 }
 
+/* META @meta: internal=true; */
 uint hash_uint3(uint kx, uint ky, uint kz)
 {
   uint a, b, c;
@@ -83,6 +86,7 @@ uint hash_uint3(uint kx, uint ky, uint kz)
   return c;
 }
 
+/* META @meta: internal=true; */
 uint hash_uint4(uint kx, uint ky, uint kz, uint kw)
 {
   uint a, b, c;
@@ -103,21 +107,25 @@ uint hash_uint4(uint kx, uint ky, uint kz, uint kw)
 #undef final
 #undef mix
 
+/* META @meta: internal=true; */
 uint hash_int(int kx)
 {
   return hash_uint(uint(kx));
 }
 
+/* META @meta: internal=true; */
 uint hash_int2(int kx, int ky)
 {
   return hash_uint2(uint(kx), uint(ky));
 }
 
+/* META @meta: internal=true; */
 uint hash_int3(int kx, int ky, int kz)
 {
   return hash_uint3(uint(kx), uint(ky), uint(kz));
 }
 
+/* META @meta: internal=true; */
 uint hash_int4(int kx, int ky, int kz, int kw)
 {
   return hash_uint4(uint(kx), uint(ky), uint(kz), uint(kw));
@@ -125,21 +133,25 @@ uint hash_int4(int kx, int ky, int kz, int kw)
 
 /* Hashing uint or uint[234] into a float in the range [0, 1]. */
 
+/* META @meta: internal=true; */
 float hash_uint_to_float(uint kx)
 {
   return float(hash_uint(kx)) / float(0xFFFFFFFFu);
 }
 
+/* META @meta: internal=true; */
 float hash_uint2_to_float(uint kx, uint ky)
 {
   return float(hash_uint2(kx, ky)) / float(0xFFFFFFFFu);
 }
 
+/* META @meta: internal=true; */
 float hash_uint3_to_float(uint kx, uint ky, uint kz)
 {
   return float(hash_uint3(kx, ky, kz)) / float(0xFFFFFFFFu);
 }
 
+/* META @meta: internal=true; */
 float hash_uint4_to_float(uint kx, uint ky, uint kz, uint kw)
 {
   return float(hash_uint4(kx, ky, kz, kw)) / float(0xFFFFFFFFu);
@@ -147,21 +159,25 @@ float hash_uint4_to_float(uint kx, uint ky, uint kz, uint kw)
 
 /* Hashing float or vec[234] into a float in the range [0, 1]. */
 
+/* META @meta: internal=true; */
 float hash_float_to_float(float k)
 {
   return hash_uint_to_float(floatBitsToUint(k));
 }
 
+/* META @meta: internal=true; */
 float hash_vec2_to_float(vec2 k)
 {
   return hash_uint2_to_float(floatBitsToUint(k.x), floatBitsToUint(k.y));
 }
 
+/* META @meta: internal=true; */
 float hash_vec3_to_float(vec3 k)
 {
   return hash_uint3_to_float(floatBitsToUint(k.x), floatBitsToUint(k.y), floatBitsToUint(k.z));
 }
 
+/* META @meta: internal=true; */
 float hash_vec4_to_float(vec4 k)
 {
   return hash_uint4_to_float(
@@ -170,17 +186,20 @@ float hash_vec4_to_float(vec4 k)
 
 /* Hashing vec[234] into vec[234] of components in the range [0, 1]. */
 
+/* META @meta: internal=true; */
 vec2 hash_vec2_to_vec2(vec2 k)
 {
   return vec2(hash_vec2_to_float(k), hash_vec3_to_float(vec3(k, 1.0)));
 }
 
+/* META @meta: internal=true; */
 vec3 hash_vec3_to_vec3(vec3 k)
 {
   return vec3(
       hash_vec3_to_float(k), hash_vec4_to_float(vec4(k, 1.0)), hash_vec4_to_float(vec4(k, 2.0)));
 }
 
+/* META @meta: internal=true; */
 vec4 hash_vec4_to_vec4(vec4 k)
 {
   return vec4(hash_vec4_to_float(k.xyzw),
@@ -191,18 +210,21 @@ vec4 hash_vec4_to_vec4(vec4 k)
 
 /* Hashing float or vec[234] into vec3 of components in range [0, 1]. */
 
+/* META @meta: internal=true; */
 vec3 hash_float_to_vec3(float k)
 {
   return vec3(
       hash_float_to_float(k), hash_vec2_to_float(vec2(k, 1.0)), hash_vec2_to_float(vec2(k, 2.0)));
 }
 
+/* META @meta: internal=true; */
 vec3 hash_vec2_to_vec3(vec2 k)
 {
   return vec3(
       hash_vec2_to_float(k), hash_vec3_to_float(vec3(k, 1.0)), hash_vec3_to_float(vec3(k, 2.0)));
 }
 
+/* META @meta: internal=true; */
 vec3 hash_vec4_to_vec3(vec4 k)
 {
   return vec3(hash_vec4_to_float(k.xyzw), hash_vec4_to_float(k.zxwy), hash_vec4_to_float(k.wzyx));
@@ -210,6 +232,7 @@ vec3 hash_vec4_to_vec3(vec4 k)
 
 /* Other Hash Functions */
 
+/* META @meta: internal=true; */
 float integer_noise(int n)
 {
   /* Integer bit-shifts for these calculations can cause precision problems on macOS.
@@ -221,6 +244,7 @@ float integer_noise(int n)
   return 0.5 * (float(nn) / 1073741824.0);
 }
 
+/* META @meta: internal=true; */
 float wang_hash_noise(uint s)
 {
   s = (s ^ 61u) ^ (s >> 16u);
@@ -232,12 +256,14 @@ float wang_hash_noise(uint s)
   return fract(float(s) / 4294967296.0);
 }
 
+/* META @meta: internal=true; */
 float bi_mix( float v0, float v1, float v2, float v3, float x, float y ){
     
     float x1 = 1.0 - x;
     return ( 1.0 - y ) * ( v0 * x1 + v1 * x ) + y * ( v2 * x1 + v3 * x );
 }
 
+/* META @meta: internal=true; */
 float tri_mix(float v0, float v1, float v2, float v3, float v4, float v5, float v6, float v7, float x, float y, float z ){
 
     float x1 = 1.0 - x;
@@ -247,6 +273,7 @@ float tri_mix(float v0, float v1, float v2, float v3, float v4, float v5, float 
             z * ( y1 * ( v4 * x1 + v5 * x ) + y * ( v6 * x1 + v7 * x ));
 }
 
+/* META @meta: internal=true; */
 float quad_mix(float v0,
                float v1,
                float v2,
@@ -272,16 +299,19 @@ float quad_mix(float v0,
              w );
 }
 
+/* META @meta: internal=true; */
 float fade(float t)
 {
   return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
 }
 
+/* META @meta: internal=true; */
 float negate_if(float value, uint condition)
 {
   return (condition != 0u) ? -value : value;
 }
 
+/* META @meta: internal=true; */
 float noise_grad(uint hash, float x)
 {
   uint h = hash & 15u;
@@ -289,6 +319,7 @@ float noise_grad(uint hash, float x)
   return negate_if(g, h & 8u) * x;
 }
 
+/* META @meta: internal=true; */
 float noise_grad(uint hash, float x, float y)
 {
   uint h = hash & 7u;
@@ -297,6 +328,7 @@ float noise_grad(uint hash, float x, float y)
   return negate_if(u, h & 1u) + negate_if(v, h & 2u);
 }
 
+/* META @meta: internal=true; */
 float noise_grad(uint hash, float x, float y, float z)
 {
   uint h = hash & 15u;
@@ -306,6 +338,7 @@ float noise_grad(uint hash, float x, float y, float z)
   return negate_if(u, h & 1u) + negate_if(v, h & 2u);
 }
 
+/* META @meta: internal=true; */
 float noise_grad(uint hash, float x, float y, float z, float w)
 {
   uint h = hash & 31u;
@@ -315,21 +348,25 @@ float noise_grad(uint hash, float x, float y, float z, float w)
   return negate_if(u, h & 1u) + negate_if(v, h & 2u) + negate_if(s, h & 4u);
 }
 
+/* META @meta: internal=true; */
 float noise_scale1(float result)
 {
   return 0.2500 * result;
 }
 
+/* META @meta: internal=true; */
 float noise_scale2(float result)
 {
   return 0.6616 * result;
 }
 
+/* META @meta: internal=true; */
 float noise_scale3(float result)
 {
   return 0.9820 * result;
 }
 
+/* META @meta: internal=true; */
 float noise_scale4(float result)
 {
   return 0.8344 * result;
@@ -337,6 +374,7 @@ float noise_scale4(float result)
 
 #define FLOORFRAC( x, x_int, x_fract ){ float x_floor = floor( x ); x_int = int( x_floor ); x_fract = x - x_floor; }
 
+/* META @meta: internal=true; */
 float noise_perlin1D( float x ){
     int X;
     float fx;
@@ -348,6 +386,7 @@ float noise_perlin1D( float x ){
     return r;
 }
 
+/* META @meta: internal=true; */
 float noise_perlin2D( vec2 uv ){
   int X, Y;
   float fx, fy;
@@ -368,6 +407,7 @@ float noise_perlin2D( vec2 uv ){
   return r;
 }
 
+/* META @meta: internal=true; */
 float noise_perlin3D( vec3 vec ){
   int X, Y, Z;
   float fx, fy, fz;
@@ -395,6 +435,7 @@ float noise_perlin3D( vec3 vec ){
   return r;
 }
 
+/* META @meta: internal=true; */
 float noise_perlin4D( vec4 vec ){
   int X, Y, Z, W;
   float fx, fy, fz, fw;
@@ -434,51 +475,60 @@ float noise_perlin4D( vec4 vec ){
   return r;
 }
 
+/* META @meta: internal=true; */
 float snoise1D(float p)
 {
   float r = noise_perlin1D(p);
   return (isinf(r)) ? 0.0 : noise_scale1(r);
 }
 
+/* META @meta: internal=true; */
 float noise1D(float p)
 {
   return 0.5 * snoise1D(p) + 0.5;
 }
 
+/* META @meta: internal=true; */
 float snoise2D(vec2 p)
 {
   float r = noise_perlin2D(p);
   return (isinf(r)) ? 0.0 : noise_scale2(r);
 }
 
+/* META @meta: internal=true; */
 float noise2D(vec2 p)
 {
   return 0.5 * snoise2D(p) + 0.5;
 }
 
+/* META @meta: internal=true; */
 float snoise3D(vec3 p)
 {
   float r = noise_perlin3D(p);
   return (isinf(r)) ? 0.0 : noise_scale3(r);
 }
 
+/* META @meta: internal=true; */
 float noise3D(vec3 p)
 {
   return 0.5 * snoise3D(p) + 0.5;
 }
 
+/* META @meta: internal=true; */
 float snoise4D(vec4 p)
 {
   float r = noise_perlin4D(p);
   return (isinf(r)) ? 0.0 : noise_scale4(r);
 }
 
+/* META @meta: internal=true; */
 float noise4D(vec4 p)
 {
   return 0.5 * snoise4D(p) + 0.5;
 }
 
 /* The fractal_noise functions are all exactly the same except for the input type. */
+/* META @meta: internal=true; */
 float fractal_noise1D(float p, float octaves, float roughness)
 {
   float fscale = 1.0;
@@ -508,6 +558,7 @@ float fractal_noise1D(float p, float octaves, float roughness)
 }
 
 /* The fractal_noise functions are all exactly the same except for the input type. */
+/* META @meta: internal=true; */
 float fractal_noise2D(vec2 p, float octaves, float roughness)
 {
   float fscale = 1.0;
@@ -537,6 +588,7 @@ float fractal_noise2D(vec2 p, float octaves, float roughness)
 }
 
 /* The fractal_noise functions are all exactly the same except for the input type. */
+/* META @meta: internal=true; */
 float fractal_noise3D(vec3 p, float octaves, float roughness)
 {
   float fscale = 1.0;
@@ -566,6 +618,7 @@ float fractal_noise3D(vec3 p, float octaves, float roughness)
 }
 
 /* The fractal_noise functions are all exactly the same except for the input type. */
+/* META @meta: internal=true; */
 float fractal_noise4D(vec4 p, float octaves, float roughness)
 {
   float fscale = 1.0;
@@ -594,16 +647,19 @@ float fractal_noise4D(vec4 p, float octaves, float roughness)
   }
 }
 
+/* META @meta: internal=true; */
 float random_float_offset(float seed){
     return 100.0 + hash_float_to_float(seed) * 100.0;
 }
 
+/* META @meta: internal=true; */
 vec2 random_vec2_offset(float seed){
     return vec2(
       100.0 + hash_vec2_to_float(vec2(seed, 0.0)) * 100.0,
       100.0 + hash_vec2_to_float(vec2(seed, 1.0)) * 100.0);
 }
 
+/* META @meta: internal=true; */
 vec3 random_vec3_offset(float seed){
   return vec3(
     100.0 + hash_vec2_to_float(vec2(seed, 0.0)) * 100.0,
@@ -611,6 +667,7 @@ vec3 random_vec3_offset(float seed){
     100.0 + hash_vec2_to_float(vec2(seed, 2.0)) * 100.0);
 }
 
+/* META @meta: internal=true; */
 vec4 random_vec4_offset(float seed){
   return vec4(
     100.0 + hash_vec2_to_float(vec2(seed, 0.0)) * 100.0,
@@ -621,10 +678,12 @@ vec4 random_vec4_offset(float seed){
 
 // VORONOI
 
+/* META @meta: internal=true; */
 float voronoi_distance1D(float a, float b, float metric, float exponent){
   return distance(a, b);
 }
 
+/* META @meta: internal=true; */
 float voronoi_distance2D(vec2 a, vec2 b, float metric, float exponent){
   if (metric == 0.0)  // SHD_VORONOI_EUCLIDEAN
   {
@@ -647,6 +706,7 @@ float voronoi_distance2D(vec2 a, vec2 b, float metric, float exponent){
   }
 }
 
+/* META @meta: internal=true; */
 float voronoi_distance(vec3 a, vec3 b, float metric, float exponent)
 {
   if (metric == 0.0)  // SHD_VORONOI_EUCLIDEAN
@@ -672,6 +732,7 @@ float voronoi_distance(vec3 a, vec3 b, float metric, float exponent)
   }
 }
 
+/* META @meta: internal=true; */
 float voronoi_distance(vec4 a, vec4 b, float metric, float exponent)
 {
   if (metric == 0.0)  // SHD_VORONOI_EUCLIDEAN

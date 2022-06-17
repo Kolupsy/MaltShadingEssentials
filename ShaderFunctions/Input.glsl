@@ -5,10 +5,12 @@
 #include "Vector.glsl"
 #include "Common/Transform.glsl"
 
+/* META @meta: internal=true; */
 vec3 incoming_vector( ){
     return normalize( POSITION - camera_position( ));
 }
 
+/* META @meta: internal=true; */
 float fresnel_dielectric_cos( float cosi, float eta ){
     
     float c = abs( cosi );
@@ -26,17 +28,21 @@ float fresnel_dielectric_cos( float cosi, float eta ){
     }
     return result;
 }
+/* META @meta: internal=true; */
 float fresnel_dielectric( vec3 incoming, vec3 normal, float eta ){
     return fresnel_dielectric_cos( dot( incoming, normal ), eta );
 }
 
+/* META @meta: internal=true; */
 vec3 object_coords( ){
     return transform_point( inverse( MODEL ), POSITION );
 }
+/* META @meta: internal=true; */
 vec3 camera_mapping( ){
     return transform_point( CAMERA, POSITION ) * vec3( 1, 1, -1 );
 }
 
+/* META @meta: internal=true; */
 void texture_coordinates( int uv_index, out vec3 generated, out vec3 normal, out vec2 uv, out vec3 object, out vec3 camera, out vec2 window, out vec3 reflection ){
     
     
@@ -50,6 +56,7 @@ void texture_coordinates( int uv_index, out vec3 generated, out vec3 normal, out
     reflection = reflect( incoming, normalize( NORMAL ));
 }
 
+/* META @meta: internal=true; */
 void geometry_info(
     out vec3 position, 
     out vec3 normal, 
@@ -76,6 +83,7 @@ void geometry_info(
         random_island = float( 0.0 );
     }
 
+/* META @meta: internal=true; */
 void object_info( out vec3 location, out mat4 matrix, out float dist, out vec4 id, out vec4 random ){
 
     location = model_position( );
@@ -88,6 +96,7 @@ void object_info( out vec3 location, out mat4 matrix, out float dist, out vec4 i
     random = hash_vec4_to_vec4( id );
 }
 
+/* META @meta: internal=true; */
 void camera_data( out vec3 view, out float depth, out float dist ){
     depth = abs( transform_point( CAMERA, POSITION ).z );
     vec3 cam_pos = camera_position( );
@@ -95,6 +104,7 @@ void camera_data( out vec3 view, out float depth, out float dist ){
     view = camera_mapping( );
 }
 
+/* META @meta: internal=true; */
 void screenspace_info( out vec2 flat_uv, out vec2 projected, out vec2 matcap, out vec2 screen, bool is_screen_shader ){
     vec3 camera = camera_mapping( );
     if( is_screen_shader ){
@@ -109,6 +119,7 @@ void screenspace_info( out vec2 flat_uv, out vec2 projected, out vec2 matcap, ou
     screen = screen_uv( );
 }
 
+/* META @meta: internal=true; */
 void layer_weight(float blend, vec3 normal, out float fresnel, out float facing)
 {
   normal = normalize( normal );
@@ -129,14 +140,14 @@ void layer_weight(float blend, vec3 normal, out float fresnel, out float facing)
   facing = 1.0 - facing;
 }
 
-/*  META
-    @base_color: default = 0.3;
-*/
+
+/* META @meta: internal=true; */
 float line_world_scale( float scale ){
     return float_divide( 1, float_pow( pixel_world_size( ), 0.5 )) * scale;
 }
 
 /* META
+    @meta: internal=true;
     @global_width: default = 0.3;
     @depth_influence: default = 0.8;
     @normal_influence: default = 0.5;
@@ -146,6 +157,7 @@ float tapered_lines( float global_width, float depth_influence, float normal_inf
 }
 
 /* META
+    @meta: internal=true;
     @global_width: default =  0.8;
     @depth_influence: default = 0.8;
     @normal_influence: default = 0.5;
@@ -159,12 +171,14 @@ float noisy_lines( float global_width, float depth_influence, float normal_influ
     return width * noise;
 }
 
+/* META @meta: internal=true; */
 vec3 tangent_uv_tangent( vec2 uv ){
     return compute_tangent( uv ).xyz;
 }
 
 
 /* META
+    @meta: internal=true;
     @offset: subtype = Vector;
     @rotation: subtype = Vector;
 */
@@ -177,6 +191,7 @@ vec3 tangent_radial( vec3 offset, vec3 rotation ){
     return cross( NORMAL, co );
 }
 
+/* META @meta: internal=true; */
 float get_scene_z( sampler2D normal_depth, vec2 uv ){
     float d = texture( normal_depth, uv ).w;
     return 0 - depth_to_z( d );

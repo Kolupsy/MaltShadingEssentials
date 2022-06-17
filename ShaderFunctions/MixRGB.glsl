@@ -1,5 +1,6 @@
 #ifndef SHADINGESSENTIALS_MIXRGB_GLSL
 #define SHADINGESSENTIALS_MIXRGB_GLSL
+/* META @meta: internal=true; */
 void mix_blend(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -7,6 +8,7 @@ void mix_blend(float fac, vec4 col1, vec4 col2, out vec4 result)
   result.a = col1.a;
 }
 
+/* META @meta: internal=true; */
 void mix_add(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -14,6 +16,7 @@ void mix_add(float fac, vec4 col1, vec4 col2, out vec4 result)
   result.a = col1.a;
 }
 
+/* META @meta: internal=true; */
 void mix_multiply(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -21,6 +24,7 @@ void mix_multiply(float fac, vec4 col1, vec4 col2, out vec4 result)
   result.a = col1.a;
 }
 
+/* META @meta: internal=true; */
 void mix_subtract(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -28,6 +32,7 @@ void mix_subtract(float fac, vec4 col1, vec4 col2, out vec4 result)
   result.a = col1.a;
 }
 
+/* META @meta: internal=true; */
 void mix_screen(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -37,6 +42,7 @@ void mix_screen(float fac, vec4 col1, vec4 col2, out vec4 result)
   result.a = col1.a;
 }
 
+/* META @meta: internal=true; */
 void mix_divide(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -55,6 +61,7 @@ void mix_divide(float fac, vec4 col1, vec4 col2, out vec4 result)
   }
 }
 
+/* META @meta: internal=true; */
 void mix_difference(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -62,6 +69,7 @@ void mix_difference(float fac, vec4 col1, vec4 col2, out vec4 result)
   result.a = col1.a;
 }
 
+/* META @meta: internal=true; */
 void mix_darken(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -69,6 +77,7 @@ void mix_darken(float fac, vec4 col1, vec4 col2, out vec4 result)
   result.a = col1.a;
 }
 
+/* META @meta: internal=true; */
 void mix_lighten(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -76,6 +85,7 @@ void mix_lighten(float fac, vec4 col1, vec4 col2, out vec4 result)
   result.a = col1.a;
 }
 
+/* META @meta: internal=true; */
 void mix_overlay(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -105,6 +115,7 @@ void mix_overlay(float fac, vec4 col1, vec4 col2, out vec4 result)
   }
 }
 
+/* META @meta: internal=true; */
 void mix_dodge(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -148,6 +159,7 @@ void mix_dodge(float fac, vec4 col1, vec4 col2, out vec4 result)
   }
 }
 
+/* META @meta: internal=true; */
 void mix_burn(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -198,6 +210,7 @@ void mix_burn(float fac, vec4 col1, vec4 col2, out vec4 result)
   }
 }
 
+/* META @meta: internal=true; */
 void mix_hue(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -218,6 +231,7 @@ void mix_hue(float fac, vec4 col1, vec4 col2, out vec4 result)
   }
 }
 
+/* META @meta: internal=true; */
 void mix_saturation(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -236,6 +250,7 @@ void mix_saturation(float fac, vec4 col1, vec4 col2, out vec4 result)
   }
 }
 
+/* META @meta: internal=true; */
 void mix_value(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -249,6 +264,7 @@ void mix_value(float fac, vec4 col1, vec4 col2, out vec4 result)
   result.rgb = hsv_to_rgb(hsv.rgb);
 }
 
+/* META @meta: internal=true; */
 void mix_color(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -270,6 +286,7 @@ void mix_color(float fac, vec4 col1, vec4 col2, out vec4 result)
   }
 }
 
+/* META @meta: internal=true; */
 void mix_soft_light(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
@@ -280,12 +297,14 @@ void mix_soft_light(float fac, vec4 col1, vec4 col2, out vec4 result)
   result = facm * col1 + fac * ((one - col1) * col2 * col1 + col1 * scr);
 }
 
+/* META @meta: internal=true; */
 void mix_linear_light(float fac, vec4 col1, vec4 col2, out vec4 result)
 {
   fac = clamp(fac, 0.0, 1.0);
   result = col1 + fac * (2.0 * (col2 - vec4(0.5)));
 }
 
+/* META @meta: internal=true; */
 void mix_clamp_color(vec3 vec, vec3 min, vec3 max, out vec3 out_vec)
 {
   out_vec = clamp(vec, min, max);
