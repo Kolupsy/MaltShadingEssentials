@@ -20,6 +20,7 @@ class EssentialsLensFlare( PipelineNode ):
     def reflect_inputs( cls ):
         return {
             'Color' : Parameter( '', Type.TEXTURE ),
+            'Depth' : Parameter( '', Type.TEXTURE ),
             'Rot X' : Parameter( 0.0, Type.FLOAT ),
             'Rot Y' : Parameter( 0.0, Type.FLOAT ),
             'Rot Z' : Parameter( 0.0, Type.FLOAT ),
@@ -49,6 +50,7 @@ class EssentialsLensFlare( PipelineNode ):
             self.compile_shader( )
         
         _SHADER.textures[ 'color_texture' ] = inputs[ 'Color' ]
+        _SHADER.textures[ 'depth_texture' ] = inputs[ 'Depth' ]
         _SHADER.uniforms[ 'euler_rot' ].set_value(( inputs[ 'Rot X' ], inputs[ 'Rot Y' ], inputs[ 'Rot Z']))
         self.pipeline.common_buffer.shader_callback( _SHADER )
         self.pipeline.draw_screen_pass( _SHADER, self.render_target )
