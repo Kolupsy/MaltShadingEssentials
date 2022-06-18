@@ -115,11 +115,6 @@ void vector_math_modulo(
   outVector = modf(a, b);
 }
 
-// float wrap( float a, float b, float c ){
-//   float range = c - b;
-//   return ( range <= 0 ) ? b : a - ( range * floor(( a - b ) / range ));
-// }
-
 /* META @meta: internal=true; */
 void vector_math_wrap(vec3 a, vec3 b, vec3 c, float scale, out vec3 outVector, out float outValue)
 {
