@@ -5,13 +5,14 @@
 # from Malt.GL.RenderTarget import RenderTarget
 
 import pathlib
+
 from pipeline_node import *
 
 _SHADER = None
 
-SHADERPATH = str( pathlib.Path( __file__ ).parent.parent.joinpath( 'Shaders', 'LensDistortion.glsl' ))
+SHADERPATH = str( pathlib.Path( __file__ ).parent.parent.joinpath( 'Shaders', 'Background.glsl' ))
 
-# class EssentialsLensDistortion( PipelineNode ):
+# class EssentialsBackground( PipelineNode ):
 
 #     def __init__( self, pipeline ):
 #         PipelineNode.__init__( self, pipeline )
@@ -21,9 +22,7 @@ SHADERPATH = str( pathlib.Path( __file__ ).parent.parent.joinpath( 'Shaders', 'L
 #     def reflect_inputs( cls ):
 #         return {
 #             'Color' : Parameter( '', Type.TEXTURE ),
-#             'Distortion' : Parameter( -0.1, Type.FLOAT ),
-#             'Dispersion' : Parameter( 1.0, Type.FLOAT ),
-#             'Blur' : Parameter( 0.2, Type.FLOAT )
+#             'Background Color' : Parameter( ( 0.05, 0.05, 0.05, 1.0 ), Type.FLOAT, size = 4 ),
 #         }
     
 #     @classmethod
@@ -50,10 +49,7 @@ SHADERPATH = str( pathlib.Path( __file__ ).parent.parent.joinpath( 'Shaders', 'L
 #             self.compile_shader( )
         
 #         _SHADER.textures[ 'color_texture' ] = inputs[ 'Color' ]
-        
-#         _SHADER.uniforms[ 'distortion' ].set_value( inputs[ 'Distortion' ])
-#         _SHADER.uniforms[ 'offset' ].set_value( inputs[ 'Dispersion' ])
-#         _SHADER.uniforms[ 'blur' ].set_value( inputs[ 'Blur' ])
+#         _SHADER.uniforms[ 'background_color' ].set_value( inputs[ 'Background Color' ])
 #         self.pipeline.common_buffer.shader_callback( _SHADER )
 #         self.pipeline.draw_screen_pass( _SHADER, self.render_target )
             
@@ -66,38 +62,33 @@ SHADERPATH = str( pathlib.Path( __file__ ).parent.parent.joinpath( 'Shaders', 'L
 #         global _SHADER
 #         _SHADER = self.compile_shader_from_source( f'#include "{SHADERPATH}"' )
 
-class EssentialsLensDistortion( CustomPipelineNode ):
+class EssentialsBackground( CustomPipelineNode ):
 
     @classmethod
     def static_inputs( cls ) -> dict[tuple[str, Any]]:
         return{
             'Color' : ( 'sampler2D', '' ),
-            'Distortion' : ( 'float', -0.1 ),
-            'Dispersion' : ( 'float', 1.0 ),
-            'Blur' : ( 'float', 0.2 ),
+            'Background' : ( 'vec4', ( 0.1, 0.1, 0.1, 1.0 ))
         }
     @classmethod
     def static_outputs( cls ) -> dict[tuple[str, Any]]:
         return{
             'Color' : ( 'sampler2D', '' ),
         }
-    def get_texture_targets(self) -> list[str]:
+    
+    def get_texture_targets( self ) -> list[str]:
         return [ 'COLOR' ]
     
     def render( self, inputs: dict, outputs: dict ):
         
         global _SHADER
         if not _SHADER:
-            _SHADER = self.compile_shader( f'#include "{SHADERPATH}"')
+            _SHADER = self.compile_shader( f'#include "{SHADERPATH}"' )
         
         self.render_shader( _SHADER, 
-            textures = { 'color_texture' : inputs[ 'Color' ] },
-            uniforms = {
-                'distortion' : inputs[ 'Distortion' ],
-                'offset' : inputs[ 'Dispersion' ],
-                'blur' : inputs[ 'Blur' ],
-            }
+            textures = { 'color_texture' : inputs[ 'Color' ]},
+            uniforms = { 'background_color' : inputs[ 'Background' ]}
         )
         outputs[ 'Color' ] = self.texture_targets[ 'COLOR' ]
 
-NODE = EssentialsLensDistortion
+NODE = EssentialsBackground

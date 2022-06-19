@@ -36,6 +36,10 @@ class ShadingEssentialsPlugin( PipelinePlugin ):
             if graph.language == 'GLSL':
                 graph.add_library( os.path.join( base_path, 'ShaderFunctions' ))
             if graph.language == 'Python':
+                import sys
+                pipeline_node_path = os.path.join( base_path, 'PipelineNodes' )
+                if not pipeline_node_path in sys.path:
+                    sys.path.append( pipeline_node_path )
                 graph.add_library( os.path.join( base_path, 'PipelineNodes' ))
 
     @classmethod

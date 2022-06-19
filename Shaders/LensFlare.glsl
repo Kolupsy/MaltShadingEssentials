@@ -4,6 +4,7 @@
 #include "Node Utils/common.glsl"
 #include "Common/Matrix.glsl"
 #include "../ShaderFunctions/noise_functions.glsl"
+#include "Lighting/Lighting.glsl"
 
 vec2 aspect_ratio( ){
     vec2 res = render_resolution( );
@@ -13,11 +14,35 @@ vec2 aspect_ratio( ){
 vec3 blend_in( vec3 color, float mask ){
     return clamp( color * vec3( mask ), 0.0, 1.0 );
 }
+vec3 blend_in( vec3 color, vec3 mask ){
+    return clamp( color * mask, 0.0, 1.0 );
+}
 
-vec3 sun_location( vec3 rotation ){
-    mat4 rot_mat = mat4_rotation_from_euler( rotation );
-    vec3 pos = transform_point( rot_mat, vec3( 0.0, 0.0, 99999 ));
-    return pos + transform_point( CAMERA, vec3( 0.0 ));
+vec3 light_world_location( Light light ){
+    if( !( light.type == 1 )){
+        return light.position;
+    }else{
+        return vec3( - 9999.0 ) * light.direction + camera_position( );
+    }
+}
+
+float light_intensity_coef( Light light, vec3 light_factors, float view_distance ){
+    float result = 1.0;
+    switch( light.type ){
+        case 1: //Sun
+            result = light_factors.x;
+            break;
+        case 2: //Point
+            result = light_factors.y;
+            result *= 1.0 / pow( view_distance, 2.0 );
+            break;
+        case 3: //Spot
+            result = light_factors.z;
+            result *= dot( light.direction, transform_normal( CAMERA, vec3( 0, 0, 1 )));
+            result *= 1.0 / pow( view_distance, 2.0 );
+            break;
+    }
+    return clamp( result * length( light.color ), 0.0, 99.0 );
 }
 
 vec3 world_to_camera( vec3 pos ){
@@ -29,8 +54,11 @@ bool valid_camera_pos( vec3 pos ){
 }
 
 vec2 camera_to_screen( vec3 pos ){
+    pos = transform_point( projection_matrix( ), pos );
     vec2 pos_2D = vec2( pos.x / pos.z, pos.y / pos.z );
-    return vec2( 0.5 ) - pos_2D;
+    pos_2D *= vec2( 0.5 );
+    pos_2D += vec2( 0.5 );
+    return pos_2D;
 }
 
 vec2 sun_pos_on_screen( vec3 rotation ){
@@ -54,9 +82,9 @@ vec2 flare_uv( vec2 uv, vec2 source_pos, float line_pos ){
     return uv;
 }
 
-float flare_occlusion( sampler2D depth_tex, vec2 uv, float dist = 99999 ){
+float flare_occlusion( sampler2D depth_tex, vec2 uv, float dist = 99999, float blur = 5.0 ){
     float d = texture( depth_tex, uv ).x;
-    float a = box_blur( depth_tex, uv, 10.0, false ).a;
+    float a = box_blur( depth_tex, uv, blur, false ).a * 2.0;
     if( a >= 0.5 ){
         a = min( a, ( d < dist )? 1.0 : 0.0 );
     }
@@ -68,8 +96,7 @@ float radial_gradient( vec2 uv ){
 }
 
 float main_flare( vec2 uv, vec2 pos, float speed = 0.01, float diameter = 1.03, float bloom_size = 0.02, float streak_scale = 28.0, float intensity = 1.0 ){
-    uv = uv - pos;
-    uv *= aspect_ratio( );
+
     float time = current_time( ) * speed;
     float grad1 = abs( radial_gradient( rotate_2d( uv, time * 1.3 + pos.x * 0.5 )) - 0.5);
     float grad2 = abs( radial_gradient( rotate_2d( uv, 4.4 - time / 0.4 + pos.x * 0.5 )) - 0.5 );
@@ -81,26 +108,32 @@ float main_flare( vec2 uv, vec2 pos, float speed = 0.01, float diameter = 1.03, 
     float dist = length( uv );
     float falloff = pow( dist, 0.011 * intensity );
     falloff = clamp( 1.0 - falloff, 0.0, 1.0 );
-    falloff *= 5.0;
+    falloff *= 10.0;
 
-    float bloom = pow(( diameter - dist ), 1.0 / bloom_size ) * intensity;
+    float bloom = pow(( diameter - dist ), 1.0 / bloom_size ) * ( intensity * 0.5 );
 
     streaks *= falloff;
     streaks += bloom;
     return ( streaks <= 0.0 ) ? 0.0 : streaks;
 }
 
-float flare_disk( vec2 uv, vec2 pos, float size, float intensity ){
-    uv -= pos;
-    uv *= aspect_ratio( );
+float flare_disk( vec2 uv, float size, float intensity ){
     uv /= size;
     return ( 1.0 - pow( length( uv ), 1.5 )) * intensity;
 }
+vec3 flare_disk_disp( vec2 uv, vec2 source_pos, float line_pos, float dispersion, float size, float intensity ){
+    vec2 red_uv = flare_uv( uv, source_pos, line_pos * ( 1.0 - dispersion ));
+    vec2 green_uv = flare_uv( uv, source_pos, line_pos );
+    vec2 blue_uv = flare_uv( uv, source_pos, line_pos * ( 1.0 + dispersion ));
+    return vec3(
+        flare_disk( red_uv, size, intensity ),
+        flare_disk( green_uv, size, intensity ),
+        flare_disk( blue_uv, size, intensity )
+    );
+}
 
-float flare_circle( vec2 uv, vec2 pos, float size, float intensity, float focus = 10.0 ){
-    
-    uv -= pos;
-    uv *= aspect_ratio( );
+float flare_circle( vec2 uv, float size, float intensity, float focus = 10.0 ){
+
     uv /= size;
     float grad = abs( length( uv ) - 1.0 );
     float main_ring = grad * focus * PI;
@@ -109,6 +142,40 @@ float flare_circle( vec2 uv, vec2 pos, float size, float intensity, float focus 
     main_ring *= intensity;
     return main_ring;
 }
+vec3 flare_circle_disp( vec2 uv, vec2 source_pos, float line_pos, float dispersion, float size, float intensity, float focus = 10.0 ){
+    vec2 red_uv = flare_uv( uv, source_pos, line_pos * ( 1.0 - dispersion ));
+    vec2 green_uv = flare_uv( uv, source_pos, line_pos );
+    vec2 blue_uv = flare_uv( uv, source_pos, line_pos * ( 1.0 + dispersion ));
+    return vec3(
+        flare_circle( red_uv, size, intensity, focus ),
+        flare_circle( green_uv, size, intensity, focus ),
+        flare_circle( blue_uv, size, intensity, focus )
+    );
+}
+
+vec3 lens_flare_stack( vec2 uv, Light light, vec2 light_2D, float intensity ){
+    vec3 lc = light.color;
+    vec3 result = vec3( 0.0 );
+
+    result += blend_in( lc,
+        main_flare( flare_uv( uv, light_2D, 1.0 ), light_2D, 0.03, 1.03, 0.02, 19.0, intensity  )
+    );
+    result += blend_in( lc,
+        flare_circle_disp( uv, light_2D, -0.6, 0.05, 0.3, 0.015 * intensity, 7.0 )
+    );
+    result += blend_in( lc, 
+        flare_disk_disp( uv, light_2D, -0.2, 0.05, 0.1, 0.1 * intensity )
+    );
+    result += blend_in( lc,
+        flare_disk_disp( uv, light_2D, 0.6, 0.05, 0.06, 0.1 * intensity )
+    );
+    result += blend_in( lc,
+        flare_disk_disp( uv, light_2D, 0.1, 0.05, 0.02, 0.08 * intensity )
+    );
+
+    return result;
+}
+
 
 #ifdef VERTEX_SHADER
 void main()
@@ -119,11 +186,12 @@ void main()
 
 #ifdef PIXEL_SHADER
 
-layout (location = 0) out vec4 RESULT;
+layout( location = 0 ) out vec4 RESULT;
 
 uniform sampler2D color_texture;
 uniform sampler2D depth_texture;
-uniform vec3 euler_rot;
+uniform vec3 light_factors;
+uniform float edge_fade;
 
 void main()
 {
@@ -132,38 +200,24 @@ void main()
     vec4 background = texture( color_texture, uv );
     RESULT = background;
 
-    vec3 sun_world_pos = sun_location( euler_rot );
-    vec3 sun_cam_pos = world_to_camera( sun_world_pos );
-    if( !valid_camera_pos( sun_cam_pos )){
-        return;
+    for( int i = 0; i < LIGHTS.lights_count; i++ ){
+        Light light = LIGHTS.lights[ i ];
+        if( length( light.color ) == 0.0 ){
+            continue;
+        }
+        vec3 lwl = light_world_location( light );
+        vec3 cam_pos = world_to_camera( lwl );
+        if( !valid_camera_pos( cam_pos )){
+            continue;
+        }
+        vec2 light_2D = camera_to_screen( cam_pos );
+        float view_distance = abs( length( light.position - camera_position( )));
+        float lfo = flare_occlusion( depth_texture, light_2D, view_distance, edge_fade );
+        if( lfo >= 0.99 ){
+            continue;
+        }
+        RESULT.xyz += lens_flare_stack( uv, light, light_2D, ( 1.0 - lfo ) * light_intensity_coef( light, light_factors, view_distance ));
     }
-    vec2 sun_2D = camera_to_screen( sun_cam_pos );
-    float fo = flare_occlusion( depth_texture, sun_2D );
-    if( fo >= 0.99 ){
-        return;
-    }
-    float m = 1.0 - fo;
-    vec3 flare_color = vec3( 1.0, 0.6, 0.4 );
-
-    RESULT.xyz += blend_in( flare_color,
-        main_flare( uv, flare_location( sun_2D, 1 ), 0.01, 1.03, 0.02, 19.0, m  )
-    );
-
-    RESULT.xyz += blend_in( flare_color,
-        flare_circle( uv, flare_location( sun_2D, -0.6 ), 0.3, 0.005 * m, 7.0 )
-    );
-
-    RESULT.xyz += blend_in( flare_color, 
-        flare_disk( uv, flare_location(sun_2D, -0.2 ), 0.07, 0.04 * m )
-    );
-
-    RESULT.xyz += blend_in( flare_color, 
-        flare_disk( uv, flare_location( sun_2D, 0.6 ), 0.05, 0.04 * m )
-    );
-
-    RESULT.xyz += blend_in( flare_color,
-        flare_disk( uv, flare_location( sun_2D, 0.1 ), 0.01, 0.02 * m )
-    );
 }
 
 #endif
