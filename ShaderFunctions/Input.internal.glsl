@@ -1,8 +1,8 @@
 #ifndef SHADINGESSENTIALS_INPUT_GLSL
 #define SHADINGESSENTIALS_INPUT_GLSL
 
-#include "noise_functions.glsl"
-#include "Vector.glsl"
+#include "noise_functions.internal.glsl"
+#include "Vector.internal.glsl"
 #include "Common/Transform.glsl"
 
 vec3 incoming_vector( ){

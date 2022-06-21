@@ -4,7 +4,7 @@
 #include "Node Utils/common.glsl"
 #include "Common/Matrix.glsl"
 #include "Common/Color.glsl"
-#include "../ShaderFunctions/noise_functions.glsl"
+#include "../ShaderFunctions/noise_functions.internal.glsl"
 #include "Lighting/Lighting.glsl"
 
 vec2 aspect_ratio( ){

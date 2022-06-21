@@ -1,9 +1,9 @@
 #ifndef SHADINGESSENTIALS_TEXTURES_GLSL
 #define SHADINGESSENTIALS_TEXTURES_GLSL
 
-#include "noise_functions.glsl"
-#include "Input.glsl"
-#include "Math.glsl"
+#include "noise_functions.internal.glsl"
+#include "Input.internal.glsl"
+#include "Math.internal.glsl"
 #include "Node Utils/vec2.glsl"
 #include "Node Utils/vec3.glsl"
 #include "Node Utils/vec4.glsl"

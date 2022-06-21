@@ -1,7 +1,7 @@
 #ifndef SHADINGESSENTIALS_SHADERS_GLSL
 #define SHADINGESSENTIALS_SHADERS_GLSL
 
-#include "Input.glsl"
+#include "Input.internal.glsl"
 
 /* META
     @base_color: default = (0.8, 0.8, 0.8, 1.0 );

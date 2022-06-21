@@ -2,7 +2,7 @@
 #ifndef SHADINGESSENTIALS_VECTORMATH_GLSL
 #define SHADINGESSENTIALS_VECTORMATH_GLSL
 
-#include "Math.glsl"
+#include "Math.internal.glsl"
 
 void vector_math_add(vec3 a, vec3 b, vec3 c, float scale, out vec3 outVector, out float outValue)
 {
