@@ -32,7 +32,7 @@ class PipelineNodeExtended( PipelineNode ):
         return {}
 
     @classmethod
-    def reflect_inputs( cls ) -> dict:
+    def reflect_inputs( cls ) -> dict[str,Parameter]:
         return { key: get_param( value[0], value[1]) for key, value in cls.static_inputs( ).items( )}
     
     @classmethod
@@ -100,11 +100,11 @@ class CustomPipelineNode( PipelineNodeExtended ):
     '''
 
     @classmethod
-    def static_inputs( cls ) -> dict[tuple[str, Any]]:
+    def static_inputs( cls ) -> dict[str, tuple[str, Any]]:
         return super( ).static_inputs( )
     
     @classmethod
-    def static_outputs( cls ) -> dict[tuple[str, Any]]:
+    def static_outputs( cls ) -> dict[str, tuple[str, Any]]:
         return super( ).static_outputs( )
     
     def render( self, inputs: dict, outputs: dict ):
@@ -113,4 +113,13 @@ class CustomPipelineNode( PipelineNodeExtended ):
     def get_texture_targets( self ) -> list[str]:
         return super( ).get_texture_targets( )
 
+class DummyPipelineNode( PipelineNode ):
+
+    @classmethod
+    def reflect( cls ):
+        reflection = super( ).reflect( )
+        reflection[ 'meta' ][ 'internal' ] = True
+        return reflection
+
 __all__ = [ 'Any', 'CustomPipelineNode' ]
+NODE = DummyPipelineNode

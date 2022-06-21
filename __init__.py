@@ -1,6 +1,14 @@
 import os, glob
 from Malt.PipelinePlugin import PipelinePlugin, isinstance_str
 
+BASEPATH = os.path.dirname( __file__ )
+
+def load_pipeline_nodes( ):
+    import sys
+    pipeline_nodes_path = os.path.join( BASEPATH, 'PipelineNodes' )
+    if not pipeline_nodes_path in sys.path:
+        sys.path.append( pipeline_nodes_path )
+
 def get_modules( ):
 
     all_modules = glob.glob( '*.py', root_dir = os.path.dirname( __file__ ))
@@ -31,16 +39,12 @@ class ShadingEssentialsPlugin( PipelinePlugin ):
     
     @classmethod
     def register_graph_libraries( cls, graphs ):
-        base_path = os.path.dirname(__file__)
         for graph in graphs.values():
             if graph.language == 'GLSL':
-                graph.add_library( os.path.join( base_path, 'ShaderFunctions' ))
+                graph.add_library( os.path.join( BASEPATH, 'ShaderFunctions' ))
             if graph.language == 'Python':
-                import sys
-                pipeline_node_path = os.path.join( base_path, 'PipelineNodes' )
-                if not pipeline_node_path in sys.path:
-                    sys.path.append( pipeline_node_path )
-                graph.add_library( os.path.join( base_path, 'PipelineNodes' ))
+                load_pipeline_nodes( )
+                graph.add_library( os.path.join( BASEPATH, 'PipelineNodes' ))
 
     @classmethod
     def blendermalt_register( self ):

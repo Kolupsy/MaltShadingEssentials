@@ -3,6 +3,7 @@
 #include "Filters/Blur.glsl"
 #include "Node Utils/common.glsl"
 #include "Common/Matrix.glsl"
+#include "Common/Color.glsl"
 #include "../ShaderFunctions/noise_functions.glsl"
 #include "Lighting/Lighting.glsl"
 
@@ -82,13 +83,13 @@ vec2 flare_uv( vec2 uv, vec2 source_pos, float line_pos ){
     return uv;
 }
 
-float flare_occlusion( sampler2D depth_tex, vec2 uv, float dist = 99999, float blur = 5.0 ){
-    float d = texture( depth_tex, uv ).x;
+vec3 flare_occlusion( sampler2D depth_tex, vec2 uv, float dist = 99999, float blur = 5.0 ){
+    vec3 depth_tint_sat = texture( depth_tex, uv ).xyz;
     float a = box_blur( depth_tex, uv, blur, false ).a * 2.0;
     if( a >= 0.5 ){
-        a = min( a, ( d < dist )? 1.0 : 0.0 );
+        a = min( a, ( depth_tint_sat.x < dist )? 1.0 : 0.0 );
     }
-    return a;
+    return vec3( a, depth_tint_sat.y, depth_tint_sat.z );
 }
 
 float radial_gradient( vec2 uv ){
@@ -153,23 +154,22 @@ vec3 flare_circle_disp( vec2 uv, vec2 source_pos, float line_pos, float dispersi
     );
 }
 
-vec3 lens_flare_stack( vec2 uv, Light light, vec2 light_2D, float intensity ){
-    vec3 lc = light.color;
+vec3 lens_flare_stack( vec2 uv, vec3 light_color, vec2 light_2D, float intensity ){
     vec3 result = vec3( 0.0 );
 
-    result += blend_in( lc,
+    result += blend_in( light_color,
         main_flare( flare_uv( uv, light_2D, 1.0 ), light_2D, 0.03, 1.03, 0.02, 19.0, intensity  )
     );
-    result += blend_in( lc,
+    result += blend_in( light_color,
         flare_circle_disp( uv, light_2D, -0.6, 0.05, 0.3, 0.015 * intensity, 7.0 )
     );
-    result += blend_in( lc, 
+    result += blend_in( light_color, 
         flare_disk_disp( uv, light_2D, -0.2, 0.05, 0.1, 0.1 * intensity )
     );
-    result += blend_in( lc,
+    result += blend_in( light_color,
         flare_disk_disp( uv, light_2D, 0.6, 0.05, 0.06, 0.1 * intensity )
     );
-    result += blend_in( lc,
+    result += blend_in( light_color,
         flare_disk_disp( uv, light_2D, 0.1, 0.05, 0.02, 0.08 * intensity )
     );
 
@@ -212,11 +212,12 @@ void main()
         }
         vec2 light_2D = camera_to_screen( cam_pos );
         float view_distance = abs( length( light.position - camera_position( )));
-        float lfo = flare_occlusion( depth_texture, light_2D, view_distance, edge_fade );
-        if( lfo >= 0.99 ){
+        vec3 lfo = flare_occlusion( depth_texture, light_2D, view_distance, edge_fade );
+        if( lfo.x >= 0.99 ){
             continue;
         }
-        RESULT.xyz += lens_flare_stack( uv, light, light_2D, ( 1.0 - lfo ) * light_intensity_coef( light, light_factors, view_distance ));
+        vec3 mix_color = mix( light.color, light.color * hsv_to_rgb(vec3( lfo.y, lfo.z, 1.0 )), lfo.x );
+        RESULT.xyz += lens_flare_stack( uv, mix_color, light_2D, ( 1.0 - lfo.x ) * light_intensity_coef( light, light_factors, view_distance ));
     }
 }
 
