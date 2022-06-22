@@ -7,6 +7,20 @@ from .nodes.utils import EssentialsNode
 
 CAT_DATA = EssentialsNode.get_category_data( )
 
+def get_all_pipeline_nodes( ) -> list[object]:
+    import importlib, sys
+    result = []
+    pipeline_nodes_path = pathlib.Path( __file__ ).parent.joinpath( 'PipelineNodes' )
+    if not str( pipeline_nodes_path ) in sys.path:
+        sys.path.append( str( pipeline_nodes_path ))
+    pipeline_nodes = [ x.stem for x in pipeline_nodes_path.glob( '*.py' ) if not x.name == '__init__.py' ]
+    for node_module_name in pipeline_nodes:
+        m = importlib.import_module( node_module_name )
+        if hasattr( m, 'NODE' ):
+           result.append( m.NODE )
+
+    return result 
+        
 class LibraryItem( object ):
 
     node_clss = None
@@ -16,45 +30,48 @@ class LibraryItem( object ):
 
     @property
     def label( self ):
-        return self.node_clss.bl_label
+        return getattr( self.node_clss, 'bl_label', self.node_clss.__name__ )
     @property
     def idname( self ):
-        return self.node_clss.bl_idname
+        return getattr( self.node_clss, 'bl_idname', self.node_clss.__name__ )
+    @property
+    def tooltip( self ):
+        return getattr( self.node_clss, 'tooltip', '' )
     @property
     def path( self ):
         return '/'.join( self.node_clss.__module__.split( '.' )[-2:]) + '.py'
-    @property
-    def category_name( self ):
-        return CAT_DATA[ self.category ][0]
+
+    def format_tooltip( self ):
+        formatted_tooltip = self.tooltip
+        while formatted_tooltip[0] in [ '\n', '\t', ' ' ]:
+            formatted_tooltip = formatted_tooltip[1:]
+        while formatted_tooltip[-1] in [ '\n', '\t', ' ' ]:
+            formatted_tooltip = formatted_tooltip[:-1]
+        formatted_tooltip = formatted_tooltip.replace( '\n', '\n\t' )
+        return formatted_tooltip
+
     @property
     def formatted( self ):
         f = f'- {self.label} / {self.idname} : [{self.path}]\n'
         if self.valid_tooltip( ):
             f += '\t'
-            formatted_tooltip = self.node_clss.tooltip
-            while formatted_tooltip[0] in [ '\n', '\t', ' ' ]:
-                formatted_tooltip = formatted_tooltip[1:]
-            while formatted_tooltip[-1] in [ '\n', '\t', ' ' ]:
-                formatted_tooltip = formatted_tooltip[:-1]
-            formatted_tooltip = formatted_tooltip.replace( '\n', '\n\t' )
-            f += formatted_tooltip
+            f += self.format_tooltip( )
             f += '\n'
         return f
     
     def valid_tooltip( self ):
-        t = self.node_clss.tooltip
+        t = self.tooltip
         return not t == '' and not all( x in [ ' ', '\n', '\t' ] for x in t )
 
 def generate_library( ):
 
     nodes = get_all_nodes( )
-    library = {}
-    for key in CAT_DATA.keys( ):
-        library[ key ] = []
+    library = { key : [] for key in CAT_DATA.keys( )}
     
     for n in nodes:
-
         library[ n.menu_category ].append( LibraryItem( n ))
+    for n in get_all_pipeline_nodes( ):
+        library[ 'OTHER' ].append( LibraryItem( n ))
 
     text = '# Shader Nodes\n\n'
 

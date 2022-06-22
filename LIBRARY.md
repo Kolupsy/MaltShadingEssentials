@@ -1,5 +1,12 @@
 # Shader Nodes
 
+**Other:**
+- EssentialsBackground / EssentialsBackground : [background.py]
+- EssentialsBloom / EssentialsBloom : [bloom.py]
+- EssentialsLensDistortion / EssentialsLensDistortion : [lens_distortion.py]
+- EssentialsLensFlare / EssentialsLensFlare : [lens_flare.py]
+- DummyPipelineNode / DummyPipelineNode : [pipeline_node.py]
+
 **Input:**
 - Ambient Occlusion / MaltNodeAmbientOcclusion : [nodes/ambient_occlusion.py]
 - Geometry / MaltNodeGeometry : [nodes/geometry.py]
@@ -39,6 +46,7 @@
 
 **Texture:**
 - Outlines / MaltNodeOutlines : [nodes/outlines.py]
+- Blur / MaltNodeTexBlur : [nodes/tex_blur.py]
 - Environment Texture / MaltNodeTexEnvironment : [nodes/tex_environment.py]
 - Gradient Texture / MaltNodeTexGradient : [nodes/tex_gradient.py]
 - Image Texture / MaltNodeTexImage : [nodes/tex_image.py]
@@ -62,6 +70,7 @@
 **Vector:**
 - Bevel / MaltNodeBevel : [nodes/bevel.py]
 - Mapping / MaltNodeMapping : [nodes/mapping.py]
+- Vector Angle / MaltNodeVectorAngle : [nodes/vector_angle.py]
 - Rotate / MaltNodeVectorRotate : [nodes/vector_rotate.py]
 - Vector Transform / MaltNodeVectorTransform : [nodes/vector_transform.py]
 
