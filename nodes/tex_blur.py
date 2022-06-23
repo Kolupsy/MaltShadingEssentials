@@ -8,7 +8,7 @@ blur_mode_items = [
 ]
 calculation_mode_items = [
     ( 'ABSOLUTE', 'Absolute Radius', 'Calculate the blur using an absolute pixel radius number' ),
-    ( 'RATIO', 'Ratio', 'Calculate the blur based on a fixed ratio to the render resolution' ),
+    ( 'RATIO', 'Ratio', 'Calculate the blur size relative to the texture size' ),
 ]
 
 class MaltNodeTexBlur( EssentialsNode ):
@@ -33,7 +33,7 @@ class MaltNodeTexBlur( EssentialsNode ):
             'box_circular' : I( 'bool', 'Circular', default = False ),
             'jitter_exponent' : I( 'float', 'Exponent', default = 5.0 ),
             'jitter_samples' : I( 'int', 'Samples', default = 8 ),
-            'gaussian_sigma' : I( 'float', 'Sigma', default = 1.0 ),
+            'gaussian_sigma' : I( 'float', 'Sigma', default = 5.0 ),
             'result' : O( 'vec4', 'Result' )
         }
     
@@ -51,7 +51,7 @@ class MaltNodeTexBlur( EssentialsNode ):
     def get_function( self ):
         f = ''
         if self.calculation_mode == 'RATIO':
-            f += 'radius = render_resolution( ).y * ratio;\n'
+            f += 'radius = get_texture_size( input_texture ) * ratio;\n'
 
         f += {
             'BOX' : 'result = box_blur( input_texture, uv, radius, box_circular );\n',

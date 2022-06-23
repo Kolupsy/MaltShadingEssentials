@@ -2,6 +2,7 @@
 #include "Common.glsl"
 #include "Filters/Blur.glsl"
 #include "Node Utils/common.glsl"
+#include "../ShaderFunctions/Utils.internal.glsl"
 
 #ifdef VERTEX_SHADER
 void main()
@@ -27,7 +28,7 @@ void main()
     float bloom_intensity = bloom_settings.y;
     float bloom_radius = bloom_settings.z;
     vec4 screen_color = texture( color_texture, uv );
-    vec3 blurred_color = jitter_blur( color_texture, uv, render_resolution( ).y * bloom_radius, 5.0, samples ).xyz;
+    vec3 blurred_color = jitter_blur( color_texture, uv, render_size( ) * bloom_radius, 5.0, samples ).xyz;
     
 
     blurred_color.r = pow( blurred_color.r, bloom_exponent ) * bloom_intensity;

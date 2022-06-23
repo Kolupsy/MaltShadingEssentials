@@ -1,6 +1,7 @@
 #include "Common.glsl"
 #include "Filters/Blur.glsl"
 #include "Node Utils/common.glsl"
+#include "../ShaderFunctions/Utils.internal.glsl"
 
 // https://www.shadertoy.com/view/4lSGRw
 vec2 compute_distored_UVs( vec2 uv, float k, float kcube ){
@@ -70,8 +71,7 @@ void main()
 {
     PIXEL_SETUP_INPUT();
     vec2 uv = UV[0];
-    float resolution = render_resolution( ).y;
-    RESULT = distorted_image( color_texture, uv, distortion, offset, resolution * blur );
+    RESULT = distorted_image( color_texture, uv, distortion, offset, render_size( ) * blur );
 }
 
 #endif

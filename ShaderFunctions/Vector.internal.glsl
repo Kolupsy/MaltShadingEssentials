@@ -52,4 +52,13 @@ float vector_angle_2D_continuous( vec2 vector ){
             : tang;
 }
 
+vec2 object_view_orientation( vec3 vector, vec3 location, vec3 rotation, vec3 scale ){
+    vec3 point_A = location;
+    vec3 point_B = vector_mapping_point( vector, location, rotation, scale );
+    point_A = transform_point( CAMERA, point_A );
+    point_B = transform_point( CAMERA, point_B );
+    vec2 point_A_2D = vec2( point_A.x / point_A.z, point_A.y / point_A.z );
+    vec2 point_B_2D = vec2( point_B.x / point_B.z, point_B.y / point_B.z );
+    return point_A_2D - point_B_2D;
+}
 #endif
