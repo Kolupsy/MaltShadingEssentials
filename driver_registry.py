@@ -102,8 +102,8 @@ def persistent_registry_update( *_args ):
             drivers.remove_item( item )
 
 def register_persistent_update( register ):
-    handler = handlers.depsgraph_update_post
-    getattr( handler, 'append' if register else 'remove' )( persistent_registry_update )
+    for handler in ( handlers.depsgraph_update_pre, handlers.frame_change_pre, handlers.render_pre ):
+        getattr( handler, 'append' if register else 'remove' )( persistent_registry_update )
 
 CLASSES = [
     IndirectPointer,

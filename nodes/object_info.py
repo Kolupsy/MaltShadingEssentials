@@ -10,7 +10,7 @@ class MaltNodeObjectInfo( EssentialsNode ):
             'location' : O( 'vec3', 'Location' ),
             'matrix' : O( 'mat4', 'Object Matrix' ),
             'distance' : O( 'float', 'Distance' ),
-            'id' : O( 'vec4', 'ID' ),
+            'id' : O( 'vec4', 'Name ID' ),
             'random' : O( 'vec4', 'Random' ),
         }
     
