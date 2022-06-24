@@ -66,11 +66,11 @@ vec2 object_view_orientation( vec3 vector, vec3 location, vec3 rotation, vec3 sc
     return point_A_2D - point_B_2D;
 }
 
-// vec2 vector_distortion( vec2 vector, vec2 distortion, float factor ){
-//     distortion -= vec2( 0.5 );
-//     distortion *= vec2( factor );
-//     return vector + distortion;
-// }
+vec2 vector_distortion( vec2 vector, vec2 distortion, float factor ){
+    distortion -= vec2( 0.5 );
+    distortion *= vec2( factor );
+    return vector + distortion;
+}
 
 vec3 vector_distortion( vec3 vector, vec3 distortion, float factor ){
 
@@ -79,11 +79,11 @@ vec3 vector_distortion( vec3 vector, vec3 distortion, float factor ){
     return vector + distortion;
 }
 
-// vec4 vector_distortion( vec4 vector, vec4 distortion, float factor ){
+vec4 vector_distortion( vec4 vector, vec4 distortion, float factor ){
 
-//     distortion -= vec4( 0.5 );
-//     distortion *= vec4( factor );
-//     return vector + distortion;
-// }
+    distortion -= vec4( 0.5 );
+    distortion *= vec4( factor );
+    return vector + distortion;
+}
 
 #endif

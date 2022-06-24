@@ -184,7 +184,7 @@ vec3 tangent_radial( vec3 offset, vec3 rotation ){
 /* META
     @world_coordinates: default = view_direction( );
 */
-vec3 sky_uv( vec3 world_coordinates, float horizon = 0.0 ){
+vec3 sky_coords( vec3 world_coordinates, float horizon = 0.0 ){
     float z = world_coordinates.z + horizon;
     return vec3( world_coordinates.x / z, world_coordinates.y / z, pow( z, 0.5 ));
 }
