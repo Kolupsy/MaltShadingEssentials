@@ -3,6 +3,8 @@
 
 #include "Input.internal.glsl"
 
+#ifndef IS_LIGHT_SHADER
+
 /* META
     @base_color: default = (0.8, 0.8, 0.8, 1.0 );
     @normal : subtype = Normal; default = NORMAL;
@@ -64,4 +66,5 @@ vec4 emission( vec4 color, float brightness, float mask ){
     return result;
 }
 
-#endif
+#endif //IS_LIGHT_SHADER
+#endif //SHADINGESSENTIALS_SHADERS_GLSL
