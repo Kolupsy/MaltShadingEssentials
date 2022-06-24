@@ -3,6 +3,7 @@
 #define SHADINGESSENTIALS_VECTORMATH_GLSL
 
 #include "Math.internal.glsl"
+#include "Node Utils/vec3.glsl"
 
 void vector_math_add(vec3 a, vec3 b, vec3 c, float scale, out vec3 outVector, out float outValue)
 {

@@ -1,6 +1,10 @@
 #ifndef SHADINGESSENTIALS_VECTOR_GLSL
 #define SHADINGESSENTIALS_VECTOR_GLSL
 
+#include "Common/Transform.glsl"
+#include "Common/Matrix.glsl"
+#include "Common/Quaternion.glsl"
+
 mat4 rotation_matrix_axis_angle( vec3 axis, float angle ){
     return mat4_rotation_from_quaternion( quaternion_from_axis_angle( normalize( axis ), angle ));
 }
@@ -32,7 +36,7 @@ vec3 vector_mapping_point( vec3 vector, vec3 location, vec3 rotation, vec3 scale
 vec3 vector_mapping_texture( vec3 vector, vec3 location, vec3 rotation, vec3 scale ){
     vec3 result = vector - location;
     result = rotate_euler_inverted( result, rotation );
-    return vec3_divide( result, scale );
+    return result / scale;
 }
 vec3 vector_mapping_vector( vec3 vector, vec3 rotation, vec3 scale ){
     return rotate_euler( vector * scale, rotation );
@@ -61,4 +65,25 @@ vec2 object_view_orientation( vec3 vector, vec3 location, vec3 rotation, vec3 sc
     vec2 point_B_2D = vec2( point_B.x / point_B.z, point_B.y / point_B.z );
     return point_A_2D - point_B_2D;
 }
+
+// vec2 vector_distortion( vec2 vector, vec2 distortion, float factor ){
+//     distortion -= vec2( 0.5 );
+//     distortion *= vec2( factor );
+//     return vector + distortion;
+// }
+
+vec3 vector_distortion( vec3 vector, vec3 distortion, float factor ){
+
+    distortion -= vec3( 0.5 );
+    distortion *= vec3( factor );
+    return vector + distortion;
+}
+
+// vec4 vector_distortion( vec4 vector, vec4 distortion, float factor ){
+
+//     distortion -= vec4( 0.5 );
+//     distortion *= vec4( factor );
+//     return vector + distortion;
+// }
+
 #endif

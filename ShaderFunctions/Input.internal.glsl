@@ -3,7 +3,14 @@
 
 #include "noise_functions.internal.glsl"
 #include "Vector.internal.glsl"
+
 #include "Common/Transform.glsl"
+#include "Common/Normal.glsl"
+
+#include "Node Utils/common.glsl"
+#include "Node Utils/packing.glsl"
+
+#include "NPR_Pipeline/NPR_Filters.glsl"
 
 vec3 incoming_vector( ){
     return normalize( POSITION - camera_position( ));
@@ -79,8 +86,8 @@ void geometry_info(
 void object_info( out vec3 location, out mat4 matrix, out float dist, out vec4 id, out vec4 random ){
 
     location = model_position( );
-    matrix = MODEL;
-    dist = distance( location, transform_point( inverse( CAMERA ), vec3( 0 )));
+    matrix = model_matrix( );
+    dist = distance( location, transform_point( inverse( camera_matrix( )), vec3( 0 )));
     vec4 crap_1;
     vec4 crap_2;
     vec4 crap_3;
@@ -129,11 +136,9 @@ void layer_weight(float blend, vec3 normal, out float fresnel, out float facing)
   facing = 1.0 - facing;
 }
 
-/*  META
-    @base_color: default = 0.3;
-*/
 float line_world_scale( float scale ){
-    return float_divide( 1, float_pow( pixel_world_size( ), 0.5 )) * scale;
+    return ( 1 / pow( pixel_world_size( ), 0.5 )) * scale;
+    // return float_divide( 1, float_pow( pixel_world_size( ), 0.5 )) * scale;
 }
 
 /* META
@@ -163,7 +168,6 @@ vec3 tangent_uv_tangent( vec2 uv ){
     return compute_tangent( uv ).xyz;
 }
 
-
 /* META
     @offset: subtype = Vector;
     @rotation: subtype = Vector;
@@ -177,9 +181,12 @@ vec3 tangent_radial( vec3 offset, vec3 rotation ){
     return cross( NORMAL, co );
 }
 
-float get_scene_z( sampler2D normal_depth, vec2 uv ){
-    float d = texture( normal_depth, uv ).w;
-    return 0 - depth_to_z( d );
+/* META
+    @world_coordinates: default = view_direction( );
+*/
+vec3 sky_uv( vec3 world_coordinates, float horizon = 0.0 ){
+    float z = world_coordinates.z + horizon;
+    return vec3( world_coordinates.x / z, world_coordinates.y / z, pow( z, 0.5 ));
 }
 
 #endif

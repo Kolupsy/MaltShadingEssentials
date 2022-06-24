@@ -4,9 +4,14 @@
 #include "noise_functions.internal.glsl"
 #include "Input.internal.glsl"
 #include "Math.internal.glsl"
+
+#include "Node Utils/float.glsl"
 #include "Node Utils/vec2.glsl"
 #include "Node Utils/vec3.glsl"
 #include "Node Utils/vec4.glsl"
+#include "Node Utils/sampler.glsl"
+
+#include "Common/Mapping.glsl"
 
 // PERLIN NOISE =================================================================================
 
@@ -1011,24 +1016,6 @@ void voronoi_texture_n_sphere_radius_4d(vec4 coord,
 vec4 sampler2D_sample_environment( sampler2D texture, vec3 vector ){
     vec2 uv = hdri_uv( vector );
     return sampler2D_sample_nearest( texture, uv );
-}
-
-/* META
-    @normal: default = NORMAL;
-    @roughness: default = 0.0;
-    @samples: default = 1;
-*/
-vec4 sampler2D_sample_environment_blurry( sampler2D texture, vec3 normal, float roughness, int samples ){
-    samples = clamp( samples, 1, 1024 );
-    roughness = clamp( roughness * 0.5, 0.0, 0.5 );
-    vec3 incoming = incoming_vector( );
-    vec4 result;
-    for( int i = 0; i < samples; i++ ){
-        vec3 diffuse_normal = mix( normal, hash( normal + random_vec3_offset( i ) ).xyz - vec3( 0.5 ), roughness );
-        vec3 reflection_vector = reflect( incoming, normalize( diffuse_normal ));
-        result += sampler2D_sample_environment( texture, reflection_vector );
-    }
-    return result / samples;
 }
 
 vec4 texture_flow( sampler2D texture, vec2 uv, vec2 flow, float progression, int samples ){
