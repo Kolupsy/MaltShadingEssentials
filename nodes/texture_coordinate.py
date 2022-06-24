@@ -40,4 +40,18 @@ class MaltNodeUVMap( EssentialsNode ):
     def get_function( self ):
         return 'uv = surface_uv( index );'
 
-NODES = [ MaltNodeTextureCoordinate, MaltNodeUVMap ]
+class MaltNodeSkyUV( EssentialsNode ):
+    bl_idname = 'MaltNodeSkyUV'
+    bl_label = 'Sky UV'
+    menu_category = 'INPUT'
+
+    def define_sockets( self ):
+        return{
+            'horizon' : I( 'float', 'Horizon', default = 0.01 ),
+            'uv' : O( 'vec3', 'UV' )
+        }
+    
+    def get_function( self ):
+        return 'uv = sky_uv( view_direction( ), horizon );'
+
+NODES = [ MaltNodeTextureCoordinate, MaltNodeUVMap, MaltNodeSkyUV ]
