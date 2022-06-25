@@ -3,18 +3,18 @@ from pipeline_node import *
 
 _SHADER = None
 
-SHADERPATH = str( pathlib.Path( __file__ ).parent.parent.joinpath( 'Shaders', 'SunFlare.glsl' ))
+SHADERPATH = str( pathlib.Path( __file__ ).parent.parent.joinpath( 'Shaders', 'Dithering.glsl' ))
 
-class EssentialsSunFlare( CustomPipelineNode ):
+class EssentialsDithering( CustomPipelineNode ):
 
     @classmethod
     def static_inputs( cls ) -> dict[tuple[str, Any]]:
         return{
             'Color' : ( 'sampler2D', '' ),
-            'Occlusion' : ( 'sampler2D', '' ),
-            'Scene' : ( 'OTHER', 'Scene' ),
-            'Intensity' : ( 'float', 1.0 ),
-            'Edge Fade' : ( 'float', 5.0 ),
+            'Noise' : ( 'sampler2D', '' ),
+            'Gamma' : ( 'float', 1.0 ),
+            'Darker' : ( 'vec4', ( 0.06, 0.1, 0.05, 1.0 )),
+            'Lighter' : ( 'vec4', ( 1.0, 0.97, 0.7, 1.0 )),
         }
     @classmethod
     def static_outputs( cls ) -> dict[tuple[str, Any]]:
@@ -29,19 +29,18 @@ class EssentialsSunFlare( CustomPipelineNode ):
         global _SHADER
         if not _SHADER:
             _SHADER = self.compile_shader( f'#include "{SHADERPATH}"' )
-
-        self.setup_lights_buffer( _SHADER, inputs[ 'Scene' ])
         
         self.render_shader( _SHADER,
             textures = {
                 'color_texture' : inputs[ 'Color' ],
-                'occlusion_texture' : inputs[ 'Occlusion' ]
+                'threshold_texture' : inputs[ 'Noise' ],
             },
             uniforms = {
-                'intensity_factor' : inputs[ 'Intensity' ],
-                'edge_fade' : inputs[ 'Edge Fade' ],
+                'gamma' : inputs[ 'Gamma' ],
+                'darker_color' : inputs[ 'Darker' ],
+                'lighter_color' : inputs[ 'Lighter' ],
             }
         )
         outputs[ 'Color' ] = self.texture_targets[ 'COLOR' ]
 
-NODE = EssentialsSunFlare
+NODE = EssentialsDithering

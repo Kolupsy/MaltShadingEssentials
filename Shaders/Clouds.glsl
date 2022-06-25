@@ -97,14 +97,14 @@ void main()
     vec3 coords = sky_coords( world_coords, 0.033 );
     float time = current_time( );
 
-    vec2 big_offset = rotate_2d( vec2( time * wind_speed * 0.5, 0.0 ), wind_angle );
-    float big = main_cloud_layer( coords.xy + big_offset, 0.28, 0.28, 1.0, 0.7, 2.0 );
-    vec2 medium_offset = rotate_2d( vec2( time * wind_speed, 0.0 ), wind_angle ) + big_offset;
-    float medium = main_cloud_layer( coords.xy + medium_offset, 1.54, 0.64, 2.8, 0.7, 1.58 );
-    float small = main_cloud_layer( coords.xy + medium_offset, 7.473, 5.69, 2.0, 0.7, 0.284 );
-
     float clouds;
     if( main_cloud_strength > 0.0 ){
+        vec2 big_offset = rotate_2d( vec2( time * wind_speed * 0.5, 0.0 ), wind_angle );
+        float big = main_cloud_layer( coords.xy + big_offset, 0.28, 0.28, 1.0, 0.7, 2.0 );
+        vec2 medium_offset = rotate_2d( vec2( time * wind_speed, 0.0 ), wind_angle ) + big_offset;
+        float medium = main_cloud_layer( coords.xy + medium_offset, 1.54, 0.64, 2.8, 0.7, 1.58 );
+        float small = main_cloud_layer( coords.xy + medium_offset, 7.473, 5.69, 2.0, 0.7, 0.284 );
+        
         clouds = mix( big, medium, 0.297 );
         clouds = mix( clouds, small, 0.072 );
         float size_gradient = smoother_step( coords.z, 0.0, 1.0, 0.3, 0.6 );

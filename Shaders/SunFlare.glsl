@@ -166,7 +166,7 @@ layout( location = 0 ) out vec4 RESULT;
 
 uniform sampler2D color_texture;
 uniform sampler2D occlusion_texture;
-uniform vec3 light_factors;
+uniform float intensity_factor;
 uniform float edge_fade;
 
 void main()
@@ -196,7 +196,8 @@ void main()
             continue;
         }
         vec3 mix_color = mix( light.color, light.color * texture( color_texture, light_2D ).xyz, lfo );
-        RESULT.xyz += lens_flare_stack( uv, mix_color, light_2D, ( 1.0 - lfo ) * light_intensity_coef( light, light_factors, view_distance ));
+        float overflow = clamp( 1 - uv_overflow( light_2D ), 0.0, 1.0 );
+        RESULT.xyz += lens_flare_stack( uv, mix_color, light_2D, ( 1.0 - lfo ) * clamp( intensity_factor, 0.0, 99.0 ) * overflow );
     }
 }
 

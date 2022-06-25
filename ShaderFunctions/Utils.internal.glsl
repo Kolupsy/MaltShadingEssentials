@@ -18,4 +18,11 @@ vec2 aspect_ratio( ){
     return vec2( res.x / res.y, 1.0 );
 }
 
+float uv_overflow( vec2 uv ){
+    uv = abs( uv - vec2( 0.5 ));
+    float result = max( uv.x, uv.y );
+    result = result * 2.0 - 1.0;
+    return result;
+}
+
 #endif //SHADINGESSENTIALS_UTILS_GLSL

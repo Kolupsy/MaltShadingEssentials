@@ -29,7 +29,7 @@ class MaltNodeSpecularShader( BaseShaderNode ):
     def define_sockets( self ):
         return{
             'base_color' : I( 'vec4', 'Base Color', default = ( 0.8, 0.8, 0.8, 1.0 )),
-            'roughness' : I( 'float', 'Roughness', default = 0.8 ),
+            'roughness' : I( 'float', 'Roughness', default = 0.8, min = 0.0, max = 1.0 ),
             'normal' : I( 'vec3', 'Normal', subtype = 'Normal', default = 'NORMAL' ),
             'light_group' : I( 'int', 'Group', default = 1 ),
             'shadows' : I( 'bool', 'Shadows', default = True ),
