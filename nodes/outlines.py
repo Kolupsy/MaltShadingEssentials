@@ -26,12 +26,12 @@ class MaltNodeOutlines( EssentialsNode ):
 
     def define_sockets( self ):
         return{
-            'width' : I( 'float', 'Thickness', default = 0.3 ),
-            'depth' : I( 'float', 'Inner Lines', default = 0.8 ),
-            'normal' : I( 'float', 'Details', default = 0.5 ),
+            'width' : I( 'float', 'Thickness', default = 0.3, min = 0.0 ),
+            'depth' : I( 'float', 'Inner Lines', default = 0.8, min = 0.0 ),
+            'normal' : I( 'float', 'Details', default = 0.5, min = 0.0 ),
             'scale' : I( 'float', 'Noise Scale', default = 2.5 ),
-            'bias' : I( 'float', 'Bias', default = 0.7 ),
-            'id' : I( 'vec4', 'ID Bounds', subtype = 'Vector', default = ( 1.0, 1.0, 1.0, 1.0 )),
+            'bias' : I( 'float', 'Bias', default = 0.7, min = 0.0, max = 1.0 ),
+            'id' : I( 'vec4', 'ID Bounds', subtype = 'Vector', default = ( 1.0, 1.0, 1.0, 1.0 ), min = 0.0 ),
 
             'outlines' : O( 'float', 'Outline' )
         }

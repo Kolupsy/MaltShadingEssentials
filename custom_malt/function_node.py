@@ -1,5 +1,5 @@
 from bpy.types import Node
-import importlib
+import rna_prop_ui
 
 from bpy.props import EnumProperty
 from .node import MaltCustomNode
@@ -25,6 +25,25 @@ class CustomFunctionNode( Node, MaltCustomNode ):
     '''
     bl_idname = 'MaltCustomStaticNode'
     bl_label = 'Custom Static Node'
+
+    def malt_setup( self ):
+        super( ).malt_setup( )
+        print( 'now do other stuff' )
+        for param_name, data in self.get_inputs( ).items( ):
+            meta = data[ 'meta' ]
+            if type( meta.get( 'default', None )) == str:
+                continue #Sockets without exposed values dont need min/max
+            try:
+                old_id_ui = self.malt_parameters.id_properties_ui( param_name ).as_dict( )
+            except:
+                continue #some properties can not have UIs and dont need min/max
+            rna_prop_ui.rna_idprop_ui_create( 
+                self.malt_parameters, 
+                param_name, 
+                default = meta.get( 'default', old_id_ui[ 'default' ]),
+                min = meta.get( 'min', old_id_ui[ 'min' ]),
+                max = meta.get( 'max', old_id_ui[ 'max' ]),
+                )
 
     def get_function_wrapper( self ):
         header = '\n'

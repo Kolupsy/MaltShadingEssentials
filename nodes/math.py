@@ -51,6 +51,7 @@ class MaltNodeMath( EssentialsNode ):
     bl_idname = 'MaltNodeMath'
     bl_label = 'Math'
     menu_category = 'CONVERTOR'
+    default_width = 160
 
     operation : EnumProperty( name = 'Operation', items = math_op_items, update = lambda s,c:s.update_operation( ))
     clamp : BoolProperty( name = 'Clamp', default = False, update = malt_update )

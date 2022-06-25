@@ -9,9 +9,9 @@ class MaltNodeToonShader( EssentialsNode ):
 
     def define_sockets( self ):
         return{
-            'size' : I( 'float', 'Size', default = 0.5 ),
-            'gradient_size' : I( 'float', 'Gradient', default = 0.0 ),
-            'specular' : I( 'float', 'Specular', default = 0.0 ),
+            'size' : I( 'float', 'Size', default = 0.5, min = 0.0 ),
+            'gradient_size' : I( 'float', 'Gradient', default = 0.0, min = 0.0, max = 1.0 ),
+            'specular' : I( 'float', 'Specular', default = 0.0, min = 0.0, max = 1.0 ),
             'offset' : I( 'float', 'Offset', default = 0.0 ),
             'position' : I( 'vec3', 'Position', default = 'POSITION' ),
             'normal' : I( 'vec3', 'Normal', default = 'NORMAL' ),

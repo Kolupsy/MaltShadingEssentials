@@ -38,6 +38,7 @@ class MaltNodeVectorMath( EssentialsNode ):
     bl_idname = 'MaltNodeVectorMath'
     bl_label = 'Vector Math'
     menu_category = 'CONVERTOR'
+    default_width = 180
 
     operation : EnumProperty( name = 'Operation', items = vectormath_op_items, update = lambda s,c: s.update_operation( ))
 

@@ -8,6 +8,7 @@ class MaltNodeMapRange( EssentialsNode ):
     bl_idname = 'MaltNodeMapRange'
     bl_label = 'Map Range'
     menu_category = 'CONVERTOR'
+    default_width = 160
 
     clamp : BoolProperty( name = 'Clamp', default = False, update = malt_update )
     interpolation_type : EnumProperty( name = 'Interpolation Type', items = interpolation_type_items, update = lambda s,c: s.update_interpolation( ))

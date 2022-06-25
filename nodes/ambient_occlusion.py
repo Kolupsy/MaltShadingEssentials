@@ -7,8 +7,8 @@ class MaltNodeAmbientOcclusion( EssentialsNode ):
 
     def define_sockets( self ):
         return{
-            'samples' : I( 'int', 'Samples', default = 32 ),
-            'radius' : I( 'float', 'Radius', default = 1.0 ),
+            'samples' : I( 'int', 'Samples', default = 32, min = 0 ),
+            'radius' : I( 'float', 'Radius', default = 1.0, min = 0.0 ),
             'exponent' : I( 'float', 'Exponent', default = 1.0 ),
             'bias' : I( 'float', 'Bias', default = 0.01 ),
             'result' : O( 'float', 'Ambient Occlusion' )

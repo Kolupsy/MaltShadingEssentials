@@ -1,3 +1,8 @@
+from typing import Any, Union
+
+def add_meta( d:dict, key:str, value:Any ):
+    if not value == None:
+        d[ key ] = value
 
 class MaltVariable( ):
     name:str = ''
@@ -6,6 +11,18 @@ class MaltVariable( ):
     max:float = None
     default = None
     subtype = None
+
+    @property
+    def safe_min( self ) -> Union[float,None]:
+        if self.min == None:
+            return 0.0 if self.subtype == 'Color' or self.type == 'vec4' else None
+        return self.min
+    
+    @property
+    def safe_max( self ) -> Union[float,None]:
+        if self.max == None:
+            return 1.0 if self.subtype == 'Color' or self.type == 'vec4' else None
+        return self.max
 
     def __init__( self, *args, min = None, max = None, default = None, subtype = None ):
         if len( args ) == 1:
@@ -27,10 +44,10 @@ class MaltVariable( ):
         d = {}
         d['type'] = self.type
         meta = {}
-        for a in [ 'default', 'min', 'max', 'subtype' ]:
-            value = getattr( self, a )
-            if value:
-                meta[a] = value
+        add_meta( meta, 'default', self.default )
+        add_meta( meta, 'min', self.safe_min )
+        add_meta( meta, 'max', self.safe_max )
+        add_meta( meta, 'subtype', self.subtype )
         d['meta'] = meta
         return d
 

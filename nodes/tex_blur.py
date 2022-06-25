@@ -32,7 +32,7 @@ class MaltNodeTexBlur( EssentialsNode ):
             'ratio' : I( 'float', 'Ratio', default = 0.01 ),
             'box_circular' : I( 'bool', 'Circular', default = False ),
             'jitter_exponent' : I( 'float', 'Exponent', default = 5.0 ),
-            'jitter_samples' : I( 'int', 'Samples', default = 8 ),
+            'jitter_samples' : I( 'int', 'Samples', default = 8, min = 0 ),
             'gaussian_sigma' : I( 'float', 'Sigma', default = 5.0 ),
             'result' : O( 'vec4', 'Result' )
         }

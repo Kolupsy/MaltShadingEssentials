@@ -7,7 +7,7 @@ class MaltNodeVertexColor( EssentialsNode ):
 
     def define_sockets( self ):
         return{
-            'index' : I( 'int', 'Index', default = 0 ),
+            'index' : I( 'int', 'Index', default = 0, min = 0.0 ),
             'color' : O( 'vec4', 'Color' )
         }
     

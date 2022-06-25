@@ -12,7 +12,7 @@ class MaltNodeHueSaturation( EssentialsNode ):
             'h' : I( 'float', 'H', default = 0.5 ),
             's' : I( 'float', 'S', default = 1.0 ),
             'v' : I( 'float', 'V', default = 1.0 ),
-            'fac' : I( 'float', 'Fac', default = 1.0 ),
+            'fac' : I( 'float', 'Fac', default = 1.0, min = 0.0, max = 1.0 ),
             'invert' : I( 'bool', 'Invert', default = 0 ),
             'color' : I( 'vec4', 'Color', subtype = 'Color' ),
             'result' : O( 'vec4', 'Color' )
@@ -44,7 +44,7 @@ class MaltNodeInvert( EssentialsNode ):
     def define_sockets( self ):
         return{
             'color' : I( 'vec4', 'Color', default = ( 0.0, 0.0, 0.0, 1.0 )),
-            'fac' : I( 'float', 'Fac', default = 1.0 ),
+            'fac' : I( 'float', 'Fac', default = 1.0, min = 0.0, max = 1.0 ),
             'result' : O( 'vec4', 'Color' ),
         }
     

@@ -27,7 +27,7 @@ class MaltNodeBevel( EssentialsNode ):
             'radius' : I( 'float', 'Radius', default = 0.015 ),
             'exponent' : I( 'float', 'Exponent', default = 2.0 ),
             'max_dot' : I( 'float', 'Max Dot', default = 0.75 ),
-            'samples' : I( 'int', 'Samples', default = 64 ),
+            'samples' : I( 'int', 'Samples', default = 64, min = 0 ),
             'only_self' : I( 'bool', 'Only Self' ),
             'out_normal' : O( 'vec3', 'Normal' ),
         }
