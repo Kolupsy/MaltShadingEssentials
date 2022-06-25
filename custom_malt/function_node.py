@@ -1,7 +1,7 @@
-from bpy.types import Node
+import bpy
 import rna_prop_ui
 
-from bpy.props import EnumProperty
+from bpy.props import EnumProperty, StringProperty
 from .node import MaltCustomNode
 
 def PrimitiveTypeProperty( **args ):
@@ -17,7 +17,7 @@ def PrimitiveTypeProperty( **args ):
 def enum_from_rna( rna, prop_name ):
     return[( x.identifier, x.name, x.description ) for x in rna.properties[prop_name].enum_items ]
 
-class CustomFunctionNode( Node, MaltCustomNode ):
+class CustomFunctionNode( bpy.types.Node, MaltCustomNode ):
     '''Run a custom shader function from this node.
 
     def define_sockets( self ) -> dict  # Values as MaltVariable subclass
@@ -76,6 +76,13 @@ class CustomFunctionNode( Node, MaltCustomNode ):
 
     def draw_socket( self, context, layout, socket, text ):
         super( ).draw_socket( context, layout, socket, self.draw_socket_name( socket ))
+        if socket.is_output:
+            return
+        if socket.is_linked:
+            return
+        if ( default := socket.default_initialization ) == '':
+            return
+        MaltShadingEssentials_OT_socket_info.draw_ui( layout, f'Default: {default}' )
     
     def draw_socket_name( self, socket ):
         return self.define_sockets( )[ socket.identifier ].name
@@ -99,3 +106,28 @@ class CustomFunctionNode( Node, MaltCustomNode ):
 
     def define_sockets( self ):
         return {}
+
+class MaltShadingEssentials_OT_socket_info( bpy.types.Operator ):
+    bl_idname = 'maltshadingessentials.socket_info'
+    bl_label = 'Socket Info'
+    bl_options = {'INTERNAL'}
+
+    text : StringProperty( )
+
+
+    @classmethod
+    def poll( cls, context ):
+        return True
+    
+    @classmethod
+    def description( cls, context, properties ) -> str:
+        return properties.text
+
+    def execute( self, context ):
+        print( self.text )
+        return{ 'FINISHED' }
+    
+    @staticmethod
+    def draw_ui( layout, text:str ):
+        op = layout.operator( MaltShadingEssentials_OT_socket_info.bl_idname, text = '', icon = 'DOT', emboss = False )
+        op.text = text

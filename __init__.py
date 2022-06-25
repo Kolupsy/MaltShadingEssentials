@@ -15,7 +15,8 @@ def get_modules( ):
     __all__ = [ x.rsplit( '.py', 1 ) for x in all_modules if not x.startswith( '__' )]
     from . import nodes
     from . import driver_registry
-    return [ nodes, driver_registry ]
+    from . import custom_malt
+    return [ nodes, driver_registry, custom_malt ]
 
 def module_register( register, debug = False ):
     import bpy
