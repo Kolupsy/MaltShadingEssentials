@@ -13,7 +13,7 @@
 #include "NPR_Pipeline/NPR_Filters.glsl"
 
 vec3 incoming_vector( ){
-    return normalize( POSITION - camera_position( ));
+    return POSITION - camera_position( );
 }
 
 float fresnel_dielectric_cos( float cosi, float eta ){
@@ -53,7 +53,7 @@ void texture_coordinates( int uv_index, out vec3 generated, out vec3 normal, out
     generated = ( object + vec3( 1.0 )) * vec3( 0.5 );
     camera = camera_mapping( );
     window = screen_uv( );
-    vec3 incoming = incoming_vector( );
+    vec3 incoming = normalize( incoming_vector( ));
     reflection = reflect( incoming, normalize( NORMAL ));
 }
 
@@ -122,7 +122,7 @@ void layer_weight(float blend, vec3 normal, out float fresnel, out float facing)
 
   /* fresnel */
   float eta = max(1.0 - blend, 0.00001);
-  vec3 V = incoming_vector( );
+  vec3 V = normalize( incoming_vector( ));
 
   fresnel = fresnel_dielectric(V, normal, (is_front_facing( )) ? 1.0 / eta : eta);
 
@@ -187,6 +187,22 @@ vec3 tangent_radial( vec3 offset, vec3 rotation ){
 vec3 sky_coords( vec3 world_coordinates, float horizon = 0.0 ){
     float z = world_coordinates.z + horizon;
     return vec3( world_coordinates.x / z, world_coordinates.y / z, pow( z, 0.5 ));
+}
+
+/* META
+    @position: default = POSITION;
+    @tangent: default = compute_tangent( UV[0] ).xyz;
+    @normal: default = NORMAL;
+*/
+vec3 parallax_mapping( vec3 position, vec3 tangent, vec3 normal, float depth ){
+    vec3 incoming = incoming_vector( );
+    vec3 offset_position = position - incoming * vec3( depth );
+    vec3 bitangent = cross( normal, tangent );
+    return vec3(
+        dot( offset_position, tangent ),
+        dot( bitangent, offset_position ),
+        dot( offset_position, normal )
+    );
 }
 
 #endif
