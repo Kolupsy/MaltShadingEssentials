@@ -24,7 +24,7 @@ functions = {
     'WRAP' : ( 'vector_math_wrap', 'Vector 1', 'Vector 2', 'Vector 3', '', 'Vector', '' ),
     'FRACTION' : ( 'vector_math_fraction', 'Vector', '', '', '', 'Fraction', '' ),
     'ABSOLUTE' : ( 'vector_math_absolute', 'Vector', '', '', '', 'Absolute', '' ),
-    'MINIMUM' : ( 'vector_math_minimun', 'Vector 1', 'Vector 2', '', '', 'Minimum', '' ),
+    'MINIMUM' : ( 'vector_math_minimum', 'Vector 1', 'Vector 2', '', '', 'Minimum', '' ),
     'MAXIMUM' : ( 'vector_math_maximum', 'Vector 1', 'Vector 2', '', '', 'Maximum', '' ),
     'SINE' : ( 'vector_math_sine', 'Vector', '', '', '', 'Vector', '' ),
     'COSINE' : ( 'vector_math_cosine', 'Vector', '', '', '', 'Vector', '' ),
