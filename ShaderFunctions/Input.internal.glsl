@@ -84,10 +84,11 @@ void geometry_info(
         random_island = float( 0.0 );
     }
 
-void object_info( out vec3 location, out mat4 matrix, out float dist, out vec4 id, out vec4 random ){
+void object_info( out vec3 location, out vec3 scale, out mat4 matrix, out float dist, out vec4 id, out vec4 random ){
 
     location = model_position( );
     matrix = model_matrix( );
+    scale = vec3( length(matrix[0].xyz), length(matrix[1].xyz), length(matrix[2].xyz));
     dist = distance( location, transform_point( inverse( camera_matrix( )), vec3( 0 )));
     vec4 crap_1;
     vec4 crap_2;
@@ -216,18 +217,19 @@ void interior_mapping( vec3 position, vec3 incoming, vec3 room_dimensions, out v
     vec3 position_T = transform_point( inverse( MODEL ), position );
     float coord_z = room_dimensions.z * (( incoming_T.z > 0.0 )? 1.0 : -1.0 );
     wall_masks.x = clamp( coord_z, 0.0, 1.0 );
+    wall_masks.x = coord_z > 0.0? 1.0 : 0.0;
     vec3 walls_z = ray_hit( incoming_T, position_T, position_T.z, incoming_T.z, coord_z );
     vec3 walls_z_T = walls_z + vec3( 1.0, 0.0, 0.0 );
     float wall_z_l = length( walls_z );
 
     float coord_x = room_dimensions.x * (( incoming_T.x > 0.0 )? 1.0 : -1.0 );
     wall_masks.y = clamp( coord_x, 0.0, 1.0 );
+    wall_masks.y = coord_x > 0.0? 1.0 : 0.0;
     vec3 walls_x = ray_hit( incoming_T, position_T, position_T.x, incoming_T.x, coord_x );
     vec3 walls_x_T = vector_mapping_texture( walls_x, vec3( 0.0, 0.0, 1.0 ), vec3( 0.0, PI * 0.5, 0.0 ), vec3( 1.0 ));
     float wall_x_l = length( walls_x );
 
-    float coord_y = room_dimensions.y * (( incoming.y < 0.0 )? 1.0 : -1.0 );
-    vec3 walls_y = ray_hit( incoming_T, position_T, position_T.y, incoming_T.y, coord_y * 2.0 );
+    vec3 walls_y = ray_hit( incoming_T, position_T, position_T.y, incoming_T.y, room_dimensions.y * 2.0 );
     vec3 walls_y_T = vector_mapping_texture( walls_y, vec3( -1.0, 0.0, -1.0 ), vec3( PI * 0.5, 0.0, 0.0 ), vec3( 1.0 ));
     float wall_y_l = length( walls_y );
 

@@ -3,24 +3,29 @@
 **Other:**
 - EssentialsBackground / EssentialsBackground : [background.py]
 - EssentialsBloom / EssentialsBloom : [bloom.py]
+- EssentialsClouds / EssentialsClouds : [clouds.py]
+- EssentialsDithering / EssentialsDithering : [dithering.py]
 - EssentialsLensDistortion / EssentialsLensDistortion : [lens_distortion.py]
 - EssentialsLensFlare / EssentialsLensFlare : [lens_flare.py]
 - DummyPipelineNode / DummyPipelineNode : [pipeline_node.py]
+- EssentialsSky / EssentialsSky : [sky.py]
+- EssentialsSunFlare / EssentialsSunFlare : [sun_flare.py]
 
 **Input:**
 - Ambient Occlusion / MaltNodeAmbientOcclusion : [nodes/ambient_occlusion.py]
 - Geometry / MaltNodeGeometry : [nodes/geometry.py]
+- Interior Mapping / MaltNodeInteriorMapping : [nodes/interior_mapping.py]
 - Layer Weight / MaltNodeLayerWeight : [nodes/layer_weight.py]
 - Matrices / MaltNodeMatrices : [nodes/matrices.py]
 - Object Data / MaltNodeObjectData : [nodes/object_data.py]
 - Object Info / MaltNodeObjectInfo : [nodes/object_info.py]
+- Parallax Mapping / MaltNodeParallaxMapping : [nodes/parallax_mapping.py]
 - Screen Space / MaltNodeScreenSpace : [nodes/screenspace.py]
 - Tangent / MaltNodeTangent : [nodes/tangent.py]
 - Texture Coordinate / MaltNodeTextureCoordinate : [nodes/texture_coordinate.py]
 - UV Map / MaltNodeUVMap : [nodes/texture_coordinate.py]
-
-**Output:**
-- Material Output TODO (not working) / MaltNodeMaterialOutput : [nodes/material_output.py]
+- Sky Coordinates / MaltNodeSkyCoords : [nodes/texture_coordinate.py]
+- Vertex Color / MaltNodeVertexColor : [nodes/vertex_color.py]
 
 **Primitives:**
 - Float / MaltNodeFloat : [nodes/primitives.py]
@@ -31,6 +36,8 @@
 - Color / MaltNodeColor : [nodes/primitives.py]
 - Ramp / MaltNodeRamp : [nodes/primitives.py]
 - Texture / MaltNodeTexture : [nodes/primitives.py]
+- Matrix 3 / MaltNodeMatrix 3 : [nodes/primitives.py]
+- Matrix 4 / MaltNodeMatrix 4 : [nodes/primitives.py]
 
 **Shader:**
 - Diffuse / MaltNodeDiffuseShader : [nodes/base_shaders.py]
@@ -61,6 +68,7 @@
 
 **Convertor:**
 - Color Ramp / MaltNodeColorRamp : [nodes/color_ramp.py]
+- Lerp / MaltNodeLerp : [nodes/lerp.py]
 - Map Range / MaltNodeMapRange : [nodes/map_range.py]
 - Math / MaltNodeMath : [nodes/math.py]
 - Pack / MaltNodePack : [nodes/pack_unpack.py]
@@ -76,6 +84,7 @@
 - Mapping / MaltNodeMapping : [nodes/mapping.py]
 - Transformation / MaltNodeTransformation : [nodes/matrices.py]
 - Vector Angle / MaltNodeVectorAngle : [nodes/vector_angle.py]
+- Vector Distortion / MaltNodeVectorDistortion : [nodes/vector_distortion.py]
 - Rotate / MaltNodeVectorRotate : [nodes/vector_rotate.py]
 - Vector Transform / MaltNodeVectorTransform : [nodes/vector_transform.py]
 

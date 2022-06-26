@@ -17,6 +17,13 @@ def PrimitiveTypeProperty( **args ):
 def enum_from_rna( rna, prop_name ):
     return[( x.identifier, x.name, x.description ) for x in rna.properties[prop_name].enum_items ]
 
+def peel_value( value ):
+    try:
+        len( value )
+        return [ peel_value( x ) for x in value ]
+    except TypeError:
+        return value
+
 class CustomFunctionNode( bpy.types.Node, MaltCustomNode ):
     '''Run a custom shader function from this node.
 
@@ -37,7 +44,7 @@ class CustomFunctionNode( bpy.types.Node, MaltCustomNode ):
                 old_id_ui = params.id_properties_ui( param_name ).as_dict( )
             except:
                 continue #some properties can not have UIs and dont need min/max
-            set_value = params[ param_name ]
+            set_value = peel_value( params[ param_name ])
             rna_prop_ui.rna_idprop_ui_create( 
                 params, 
                 param_name, 

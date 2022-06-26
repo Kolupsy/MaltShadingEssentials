@@ -45,6 +45,8 @@ types = [
     ( 'vec4', 'Color', 'Color' ),
     ( 'sampler1D', 'Ramp', '' ),
     ( 'sampler2D', 'Texture', '' ),
+    ( 'mat3', 'Matrix 3', '' ),
+    ( 'mat4', 'Matrix 4', '' ),
 ]
 
 NODES = [ make_primitive_type( t, n, s ) for t, n, s in types ]

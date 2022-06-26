@@ -24,7 +24,6 @@ class EssentialsTemplate( ):
         return {
             'OTHER' : ( 'Other', ( 0.25, 0.25, 0.25 ), 'NONE' ),
             'INPUT' : ( 'Input', ( 0.15, 0.34, 0.3 ), 'FORWARD' ),
-            'OUTPUT': ( 'Output', ( 0.38, 0.05, 0.2 ), 'RENDER_RESULT' ),
             'PRIMITIVES' : ( 'Primitives', ( 0.34, 0.18, 0.27 ), 'NONE' ),
             'SHADER': ( 'Shader', ( 0.04, 0.29, 0.09 ), 'SHADING_RENDERED' ),
             'COLOR' : ( 'Color', ( 0.69, 0.48, 0.002 ), 'COLOR' ),
