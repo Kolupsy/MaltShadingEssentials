@@ -28,22 +28,25 @@ class CustomFunctionNode( bpy.types.Node, MaltCustomNode ):
 
     def malt_setup( self ):
         super( ).malt_setup( )
-        print( 'now do other stuff' )
         for param_name, data in self.get_inputs( ).items( ):
+            params = self.malt_parameters
             meta = data[ 'meta' ]
             if type( meta.get( 'default', None )) == str:
                 continue #Sockets without exposed values dont need min/max
             try:
-                old_id_ui = self.malt_parameters.id_properties_ui( param_name ).as_dict( )
+                old_id_ui = params.id_properties_ui( param_name ).as_dict( )
             except:
                 continue #some properties can not have UIs and dont need min/max
+            set_value = params[ param_name ]
             rna_prop_ui.rna_idprop_ui_create( 
-                self.malt_parameters, 
+                params, 
                 param_name, 
                 default = meta.get( 'default', old_id_ui[ 'default' ]),
                 min = meta.get( 'min', old_id_ui[ 'min' ]),
                 max = meta.get( 'max', old_id_ui[ 'max' ]),
                 )
+            params[ param_name ] = set_value
+            rna_prop_ui.rna_idprop_ui_prop_update( params, param_name )
 
     def get_function_wrapper( self ):
         header = '\n'
@@ -85,7 +88,12 @@ class CustomFunctionNode( bpy.types.Node, MaltCustomNode ):
         MaltShadingEssentials_OT_socket_info.draw_ui( layout, f'Default: {default}' )
     
     def draw_socket_name( self, socket ):
-        return self.define_sockets( )[ socket.identifier ].name
+        if socket.is_struct_member( ):
+            struct_socket = socket.get_struct_socket( )
+            name = socket.name.split( '.' )[-1]
+            return f'{self.draw_socket_name( struct_socket)}.{name}'
+        else:
+            return self.define_sockets( )[ socket.identifier ].name
     
     def get_inputs( self ):
         d = { }
