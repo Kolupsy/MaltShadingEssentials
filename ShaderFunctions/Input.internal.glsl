@@ -3,6 +3,7 @@
 
 #include "noise_functions.internal.glsl"
 #include "Vector.internal.glsl"
+#include "Utils.internal.glsl"
 
 #include "Common/Transform.glsl"
 #include "Common/Normal.glsl"
@@ -13,7 +14,7 @@
 #include "NPR_Pipeline/NPR_Filters.glsl"
 
 vec3 incoming_vector( ){
-    return POSITION - camera_position( );
+    return normalize( camera_position( ) - POSITION );
 }
 
 float fresnel_dielectric_cos( float cosi, float eta ){
@@ -53,7 +54,7 @@ void texture_coordinates( int uv_index, out vec3 generated, out vec3 normal, out
     generated = ( object + vec3( 1.0 )) * vec3( 0.5 );
     camera = camera_mapping( );
     window = screen_uv( );
-    vec3 incoming = normalize( incoming_vector( ));
+    vec3 incoming = normalize( incoming_vector( ) * vec3( -1.0 ));
     reflection = reflect( incoming, normalize( NORMAL ));
 }
 
@@ -195,7 +196,7 @@ vec3 sky_coords( vec3 world_coordinates, float horizon = 0.0 ){
     @normal: default = NORMAL;
 */
 vec3 parallax_mapping( vec3 position, vec3 tangent, vec3 normal, float depth ){
-    vec3 incoming = incoming_vector( );
+    vec3 incoming = incoming_vector( ) * vec3( -1.0 );
     vec3 offset_position = position - incoming * vec3( depth );
     vec3 bitangent = cross( normal, tangent );
     return vec3(
@@ -203,6 +204,38 @@ vec3 parallax_mapping( vec3 position, vec3 tangent, vec3 normal, float depth ){
         dot( bitangent, offset_position ),
         dot( offset_position, normal )
     );
+}
+
+/* META
+    @position: default = POSITION;
+    @incoming: default = incoming_vector( );
+    @room_dimensions: default = vec3( 1.0 );
+*/
+void interior_mapping( vec3 position, vec3 incoming, vec3 room_dimensions, out vec3 mapping, out vec4 wall_masks ){
+    vec3 incoming_T = transform_direction( inverse( MODEL ), incoming ) * vec3( -1.0 );
+    vec3 position_T = transform_point( inverse( MODEL ), position );
+    float coord_z = room_dimensions.z * (( incoming_T.z > 0.0 )? 1.0 : -1.0 );
+    wall_masks.x = clamp( coord_z, 0.0, 1.0 );
+    vec3 walls_z = ray_hit( incoming_T, position_T, position_T.z, incoming_T.z, coord_z );
+    vec3 walls_z_T = walls_z + vec3( 1.0, 0.0, 0.0 );
+    float wall_z_l = length( walls_z );
+
+    float coord_x = room_dimensions.x * (( incoming_T.x > 0.0 )? 1.0 : -1.0 );
+    wall_masks.y = clamp( coord_x, 0.0, 1.0 );
+    vec3 walls_x = ray_hit( incoming_T, position_T, position_T.x, incoming_T.x, coord_x );
+    vec3 walls_x_T = vector_mapping_texture( walls_x, vec3( 0.0, 0.0, 1.0 ), vec3( 0.0, PI * 0.5, 0.0 ), vec3( 1.0 ));
+    float wall_x_l = length( walls_x );
+
+    float coord_y = room_dimensions.y * (( incoming.y < 0.0 )? 1.0 : -1.0 );
+    vec3 walls_y = ray_hit( incoming_T, position_T, position_T.y, incoming_T.y, coord_y * 2.0 );
+    vec3 walls_y_T = vector_mapping_texture( walls_y, vec3( -1.0, 0.0, -1.0 ), vec3( PI * 0.5, 0.0, 0.0 ), vec3( 1.0 ));
+    float wall_y_l = length( walls_y );
+
+    wall_masks.z = ( wall_z_l < wall_x_l )? 1.0 : 0.0;
+    vec3 result = mix( walls_x_T, walls_z_T, wall_masks.z );
+    wall_masks.w = ( min( wall_z_l, wall_x_l ) < wall_y_l )? 0.0 : 1.0;
+    result = ( min( wall_z_l, wall_x_l ) < wall_y_l )? result : walls_y_T;
+    mapping = result * vec3( 0.5 );
 }
 
 #endif

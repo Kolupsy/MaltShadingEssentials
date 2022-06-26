@@ -25,4 +25,9 @@ float uv_overflow( vec2 uv ){
     return result;
 }
 
+vec3 ray_hit( vec3 incoming, vec3 position, float pos_component, float incoming_component, float dist ){
+    float t = ( dist - pos_component ) / incoming_component;
+    return ( incoming * vec3( t )) + position;
+}
+
 #endif //SHADINGESSENTIALS_UTILS_GLSL
