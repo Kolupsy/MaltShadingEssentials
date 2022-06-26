@@ -212,7 +212,7 @@ vec3 parallax_mapping( vec3 position, vec3 tangent, vec3 normal, float depth ){
     @incoming: default = incoming_vector( );
     @room_dimensions: default = vec3( 1.0 );
 */
-void interior_mapping( vec3 position, vec3 incoming, vec3 room_dimensions, out vec3 mapping, out vec4 wall_masks ){
+void interior_mapping( vec3 position, vec3 incoming, vec3 room_dimensions, out vec3 mapping, out vec4 wall_masks, out float wall_index ){
     vec3 incoming_T = transform_direction( inverse( MODEL ), incoming ) * vec3( -1.0 );
     vec3 position_T = transform_point( inverse( MODEL ), position );
     float coord_z = room_dimensions.z * (( incoming_T.z > 0.0 )? 1.0 : -1.0 );
@@ -226,7 +226,8 @@ void interior_mapping( vec3 position, vec3 incoming, vec3 room_dimensions, out v
     wall_masks.y = clamp( coord_x, 0.0, 1.0 );
     wall_masks.y = coord_x > 0.0? 1.0 : 0.0;
     vec3 walls_x = ray_hit( incoming_T, position_T, position_T.x, incoming_T.x, coord_x );
-    vec3 walls_x_T = vector_mapping_texture( walls_x, vec3( 0.0, 0.0, 1.0 ), vec3( 0.0, PI * 0.5, 0.0 ), vec3( 1.0 ));
+    vec3 walls_x_T = vector_mapping_texture( walls_x, vec3( 0.0, 0.0, 1.0 ), vec3( 0.0, PI * 0.5, 0.0 ), vec3( 1.0, 1.0, 1.0 )).yxz;
+    walls_x_T.y = 2.0 - walls_x_T.y;
     float wall_x_l = length( walls_x );
 
     vec3 walls_y = ray_hit( incoming_T, position_T, position_T.y, incoming_T.y, room_dimensions.y * 2.0 );
@@ -238,6 +239,15 @@ void interior_mapping( vec3 position, vec3 incoming, vec3 room_dimensions, out v
     wall_masks.w = ( min( wall_z_l, wall_x_l ) < wall_y_l )? 0.0 : 1.0;
     result = ( min( wall_z_l, wall_x_l ) < wall_y_l )? result : walls_y_T;
     mapping = result * vec3( 0.5 );
+
+    float wall_1_mask = wall_masks.z * ( 1.0 - wall_masks.w ) * wall_masks.x;
+    float wall_2_mask = wall_masks.y * ( 1.0 - wall_masks.z ) * ( 1.0 - wall_masks.w );
+    float wall_3_mask = ( 1.0 - wall_masks.z ) * ( 1.0 - wall_masks.w ) * ( 1.0 - wall_masks.y );
+    float wall_4_mask = wall_masks.w;
+    wall_index = mix( 0.0, 1.0, wall_1_mask );
+    wall_index = mix( wall_index, 2.0, wall_2_mask );
+    wall_index = mix( wall_index, 3.0, wall_3_mask );
+    wall_index = mix( wall_index, 4.0, wall_4_mask );    
 }
 
 #endif
