@@ -250,4 +250,10 @@ void interior_mapping( vec3 position, vec3 incoming, vec3 room_dimensions, out v
     wall_index = mix( wall_index, 4.0, wall_4_mask );    
 }
 
+void curve_view_mapping( vec3 tangent, vec3 incoming, vec3 normal, out vec2 uv, out float facing ){
+    
+    uv = curve_view_uv( tangent, incoming, normal, UV[0] );
+    facing = 1.0 - ( abs( uv.y - 0.5 ) * 2.0 );
+}
+
 #endif

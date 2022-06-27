@@ -30,4 +30,12 @@ vec3 ray_hit( vec3 incoming, vec3 position, float pos_component, float incoming_
     return ( incoming * vec3( t )) + position;
 }
 
+vec2 curve_view_uv( vec3 tangent, vec3 incoming, vec3 normal, vec2 uv ){
+
+    vec3 screen_binormal = transform_normal( CAMERA, cross( tangent, incoming ));
+    vec3 screen_normal = transform_normal( CAMERA, normal );
+    float y_grad = dot( screen_binormal, screen_normal );
+    return vec2( uv.x, ( y_grad + 1.0 ) * 0.5 );
+}
+
 #endif //SHADINGESSENTIALS_UTILS_GLSL
