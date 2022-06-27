@@ -97,7 +97,7 @@ void vector_math_ceil(vec3 a, vec3 b, vec3 c, float scale, out vec3 outVector, o
 void vector_math_modulo(
     vec3 a, vec3 b, vec3 c, float scale, out vec3 outVector, out float outValue)
 {
-  outVector = modf(a, b);
+  outVector = vec3_modulo(a, b);
 }
 
 // float wrap( float a, float b, float c ){

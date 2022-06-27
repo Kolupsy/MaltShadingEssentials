@@ -1094,4 +1094,32 @@ vec4 texture_white_noise_4d( vec4 color ){
   return hash_vec4_to_vec4( color );
 }
 
+// Based on: https://www.youtube.com/watch?v=mLRqhcPIjg8
+void hexagon_tiles( vec2 uv, float scale, float tile_size, out vec2 tile_uv, out vec2 tile_pos, out float tile_mask, out float tile_gradient, out vec4 rand_id ){
+
+  uv *= scale;
+  tile_size *= 0.5;
+  vec2 aspect = vec2( 1.0, 1.73205080757 ); //using sqrt( 3 )
+  vec2 half_aspect = aspect * vec2( 0.5 );
+  
+  vec2 hex_1_uv = vec2_modulo( uv , aspect ) - half_aspect;
+  vec2 hex_2_uv = vec2_modulo( uv + half_aspect, aspect ) - half_aspect;
+
+  float hex_1_grad = max( abs( hex_1_uv ).x, dot( abs( hex_1_uv ), normalize( aspect )));
+  hex_1_grad = ( tile_size - hex_1_grad ) / tile_size;
+  float hex_2_grad = max( abs( hex_2_uv ).x, dot( abs( hex_2_uv ), normalize( aspect )));
+  hex_2_grad = ( tile_size - hex_2_grad ) / tile_size;
+
+  tile_gradient = max( hex_1_grad, hex_2_grad );
+  tile_mask = tile_gradient > 0.0 ? 1.0 : 0.0;
+
+  tile_uv = ( hex_1_grad > 0.0 )? hex_1_uv : hex_2_uv;
+  tile_uv = tile_mask > 0.5 ? tile_uv : uv;
+
+  tile_pos = ( hex_1_grad > 0.0 )? floor( uv / aspect ) * aspect : floor(( uv + half_aspect ) / aspect ) * aspect - half_aspect;
+  tile_pos = tile_mask > 0.5 ? tile_pos / vec2( scale ) : vec2( 0.0 );
+
+  rand_id = vec4( hash_vec2_to_vec3( tile_pos ), hash_vec2_to_float( tile_pos + vec2( 1.0 )));
+}
+
 #endif
