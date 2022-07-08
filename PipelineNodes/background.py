@@ -76,8 +76,10 @@ class EssentialsBackground( CustomPipelineNode ):
             'Color' : ( 'sampler2D', '' ),
         }
     
-    def get_texture_targets( self ) -> list[str]:
-        return [ 'COLOR' ]
+    def get_render_targets(self, resolution: tuple[int, int]) -> dict[str, TextureTarget]:
+        return {
+            'MAIN' : [ TextureTarget( 'COLOR', TextureFormat.RGBA16F, resolution )]
+        }
     
     def render( self, inputs: dict, outputs: dict ):
         
@@ -85,10 +87,10 @@ class EssentialsBackground( CustomPipelineNode ):
         if not _SHADER:
             _SHADER = self.compile_shader( f'#include "{SHADERPATH}"' )
         
-        self.render_shader( _SHADER, 
+        self.render_shader( _SHADER, self.get_render_target( 'MAIN' ),
             textures = { 'color_texture' : inputs[ 'Color' ]},
             uniforms = { 'background_color' : inputs[ 'Background' ]}
         )
-        outputs[ 'Color' ] = self.texture_targets[ 'COLOR' ]
+        outputs[ 'Color' ] = self.get_output( 'MAIN', 'COLOR' )
 
 NODE = EssentialsBackground

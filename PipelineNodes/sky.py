@@ -23,8 +23,17 @@ class EssentialsSky( CustomPipelineNode ):
             'Color' : ( 'sampler2D', '' ),
             'Occlusion' : ( 'sampler2D', '' ),
         }
-    def get_texture_targets( self ) -> list[str]:
-        return [ 'COLOR', 'OCCLUSION' ]
+    def get_texture_targets( self, resolution:tuple[int,int]) -> list[TextureTarget]:
+        return [ 
+            TextureTarget( 'COLOR', TextureFormat.RGBA16F, resolution ), 
+            TextureTarget( 'OCCLUSION', TextureFormat.RGBA16F, resolution )]
+    
+    def get_render_targets(self, resolution: tuple[int, int]) -> dict[str, TextureTarget]:
+        return {
+            'MAIN' : [ 
+                TextureTarget( 'COLOR', TextureFormat.RGBA16F, resolution ),
+                TextureTarget( 'OCCLUSION', TextureFormat.RGBA16F, resolution )]
+        }
     
     def render( self, inputs: dict, outputs: dict ):
         
@@ -32,7 +41,7 @@ class EssentialsSky( CustomPipelineNode ):
         if not _SHADER:
             _SHADER = self.compile_shader( f'#include "{SHADERPATH}"' )
         
-        self.render_shader( _SHADER,
+        self.render_shader( _SHADER, self.get_render_target( 'MAIN' ),
             textures = {
                 'color_texture' : inputs[ 'Color' ],
                 'cloud_texture' : inputs[ 'Clouds' ]
@@ -44,7 +53,7 @@ class EssentialsSky( CustomPipelineNode ):
                 'cloud_occlusion_factor' : inputs[ 'Cloud Occlusion' ],
             }
         )
-        outputs[ 'Color' ] = self.texture_targets[ 'COLOR' ]
-        outputs[ 'Occlusion' ]  = self.texture_targets[ 'OCCLUSION' ]
+        outputs[ 'Color' ] = self.get_output( 'MAIN', 'COLOR' )
+        outputs[ 'Occlusion' ]  = self.get_output( 'MAIN', 'OCCLUSION' )
 
 NODE = EssentialsSky

@@ -20,8 +20,12 @@ class EssentialsClouds( CustomPipelineNode ):
         return{
             'Color' : ( 'sampler2D', '' )
         }
-    def get_texture_targets( self ) -> list[str]:
-        return [ 'COLOR' ]
+    
+    def get_render_targets( self, resolution: tuple[int, int]) -> dict[str, TextureTarget]:
+        return {
+            'MAIN' : [ TextureTarget( 'COLOR', TextureFormat.RGBA16F, resolution )]
+        }
+    
     
     def render( self, inputs: dict, outputs: dict ):
         
@@ -29,7 +33,7 @@ class EssentialsClouds( CustomPipelineNode ):
         if not _SHADER:
             _SHADER = self.compile_shader( f'#include "{SHADERPATH}"' )
         
-        self.render_shader( _SHADER,
+        self.render_shader( _SHADER, self.get_render_target( 'MAIN' ),
             uniforms = {
                 'main_cloud_strength' : inputs[ 'Main Clouds' ],
                 'streak_cloud_strength' : inputs[ 'Streaky Clouds' ],
@@ -37,6 +41,6 @@ class EssentialsClouds( CustomPipelineNode ):
                 'wind_angle' : inputs[ 'Wind Angle' ]
             }
         )
-        outputs[ 'Color' ] = self.texture_targets[ 'COLOR' ]
+        outputs[ 'Color' ] = self.get_output( 'MAIN', 'COLOR' )
 
 NODE = EssentialsClouds

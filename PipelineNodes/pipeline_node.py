@@ -1,12 +1,13 @@
 from Malt.PipelineNode import PipelineNode
 from Malt.PipelineParameters import Parameter, Type
 from Malt.GL.Texture import Texture
-from Malt.GL.GL import GL_RGBA16F
+from Malt.GL.GL import GL_RGBA16F, GL_RGBA32F, GL_R8
 from Malt.GL.Shader import Shader
 from Malt.GL.RenderTarget import RenderTarget
 from Malt.Render import Lighting
 
 from typing import Any
+from dataclasses import dataclass
 
 def get_param( glsl_type:str, default:Any ) -> Parameter:
     return{
@@ -20,6 +21,22 @@ def get_param( glsl_type:str, default:Any ) -> Parameter:
         'vec4' : Parameter( default, Type.FLOAT, size = 4 ),
         'OTHER' : Parameter( default, Type.OTHER ),
     }[ glsl_type ]
+
+class TextureFormat:
+
+    RGBA16F = GL_RGBA16F
+    RGBA32F = GL_RGBA32F
+    R8 = GL_R8
+
+@dataclass
+class TextureTarget:
+
+    name:str
+    texture_format:str
+    resolution:tuple[int, int]
+
+    def get_texture( self ):
+        return Texture( self.resolution, self.texture_format )
 
 class PipelineNodeExtended( PipelineNode ):
     
@@ -42,6 +59,8 @@ class PipelineNodeExtended( PipelineNode ):
     def __init__( self, pipeline ):
         PipelineNode.__init__( self, pipeline )
         self.resolution = None
+        self.texture_targets = {}
+        self.render_targets = {}
     
     def compile_shader_from_source( self, source, include_paths = [], defines = []) -> Shader:
         return self.pipeline.compile_shader_from_source( source = source, include_paths = include_paths, defines = defines )
@@ -49,22 +68,32 @@ class PipelineNodeExtended( PipelineNode ):
     def compile_shader( self, shader_code ) -> Shader:
         return self.compile_shader_from_source( shader_code )
     
-    def get_texture_targets( self ) -> list[str]:
-        return []
+    def get_render_targets( self, resolution:tuple[int,int]) -> dict[str,list[TextureTarget]]:
+        return {}
     
     def setup_render_targets( self, resolution ):
         self.resolution = resolution
         self.texture_targets = {}
-        for target_name in self.get_texture_targets( ):
-            self.texture_targets[ target_name ] = Texture( resolution, GL_RGBA16F )
-        self.render_target = RenderTarget([*self.texture_targets.values( )])
+
+        for name, textures in self.get_render_targets( resolution ).items( ):
+
+            render_textures = { t.name : t.get_texture( ) for t in textures }
+
+            self.texture_targets[name] = render_textures
+            self.render_targets[ name ] = RenderTarget([*render_textures.values( )])
+    
+    def get_output( self, render_target_name, texture_target_name ):
+        return self.texture_targets[ render_target_name ][ texture_target_name ]
+
+    def get_render_target( self, name ):
+        return self.render_targets[ name ]
     
     def setup_lights_buffer( self, shader:Shader, scene:'Scene' ) -> None:
         lights_buffer = Lighting.get_lights_buffer( )
         lights_buffer.load( scene, 4, 0.9, 100.0, 1, 1.0 )
         lights_buffer.shader_callback( shader )
 
-    def render_shader( self, shader:Shader, textures:dict = {}, uniforms:dict = {} ) -> None:
+    def render_shader( self, shader:Shader, target, textures:dict = {}, uniforms:dict = {} ) -> None:
         
         for tex_key, tex_value in textures.items( ):
             shader.textures[ tex_key ] = tex_value
@@ -76,7 +105,7 @@ class PipelineNodeExtended( PipelineNode ):
             shader.uniforms[ uni_key ].set_value( uni_value )
         
         self.pipeline.common_buffer.shader_callback( shader )
-        self.pipeline.draw_screen_pass( shader, self.render_target )
+        self.pipeline.draw_screen_pass( shader, target )
 
     def render( self, inputs:dict, outputs:dict ) -> None:
         pass
@@ -110,8 +139,11 @@ class CustomPipelineNode( PipelineNodeExtended ):
     def render( self, inputs: dict, outputs: dict ):
         return super().render( inputs, outputs )
     
-    def get_texture_targets( self ) -> list[str]:
-        return super( ).get_texture_targets( )
+    def get_render_targets( self, resolution: tuple[int, int]) -> dict[str, list[TextureTarget]]:
+        return super( ).get_render_targets( resolution )
+    
+    def get_render_target( self, name ):
+        return super( ).get_render_target( name )
 
 class DummyPipelineNode( PipelineNode ):
 
@@ -121,5 +153,5 @@ class DummyPipelineNode( PipelineNode ):
         reflection[ 'meta' ][ 'internal' ] = True
         return reflection
 
-__all__ = [ 'Any', 'CustomPipelineNode' ]
+__all__ = [ 'Any', 'CustomPipelineNode', 'TextureTarget', 'TextureFormat' ]
 NODE = DummyPipelineNode
