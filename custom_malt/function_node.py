@@ -32,28 +32,21 @@ class CustomFunctionNode( bpy.types.Node, MaltCustomNode ):
     '''
     bl_idname = 'MaltCustomStaticNode'
     bl_label = 'Custom Static Node'
-
+    
     def malt_setup( self ):
         super( ).malt_setup( )
         for param_name, data in self.get_inputs( ).items( ):
             params = self.malt_parameters
-            meta = data[ 'meta' ]
+            meta: dict = data[ 'meta' ].copy( )
             if type( meta.get( 'default', None )) == str:
-                continue #Sockets without exposed values dont need min/max
+                continue #Sockets without exposed values dont need any ID prop changes
             try:
-                old_id_ui = params.id_properties_ui( param_name ).as_dict( )
+                id_ui = params.id_properties_ui( param_name )
             except:
-                continue #some properties can not have UIs and dont need min/max
-            set_value = peel_value( params[ param_name ])
-            rna_prop_ui.rna_idprop_ui_create( 
-                params, 
-                param_name, 
-                default = meta.get( 'default', old_id_ui[ 'default' ]),
-                min = meta.get( 'min', old_id_ui[ 'min' ]),
-                max = meta.get( 'max', old_id_ui[ 'max' ]),
-                )
-            params[ param_name ] = set_value
-            rna_prop_ui.rna_idprop_ui_prop_update( params, param_name )
+                continue #some properties can not have UIs
+            if 'subtype' in meta.keys( ):
+                del meta['subtype']
+            id_ui.update( **meta )
 
     def get_function_wrapper( self ):
         header = '\n'

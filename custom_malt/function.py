@@ -12,18 +12,6 @@ class MaltVariable( ):
     default = None
     subtype = None
 
-    @property
-    def safe_min( self ) -> Union[float,None]:
-        if self.min == None:
-            return 0.0 if self.subtype == 'Color' or self.type == 'vec4' else None
-        return self.min
-    
-    @property
-    def safe_max( self ) -> Union[float,None]:
-        if self.max == None:
-            return 1.0 if self.subtype == 'Color' or self.type == 'vec4' else None
-        return self.max
-
     def __init__( self, *args, min = None, max = None, default = None, subtype = None ):
         if len( args ) == 1:
             self.type = args[0]
@@ -44,10 +32,13 @@ class MaltVariable( ):
         d = {}
         d['type'] = self.type
         meta = {}
+        add_meta( meta, 'min', self.min )
+        add_meta( meta, 'max', self.max )
         add_meta( meta, 'default', self.default )
-        add_meta( meta, 'min', self.safe_min )
-        add_meta( meta, 'max', self.safe_max )
         add_meta( meta, 'subtype', self.subtype )
+        if self.subtype == 'Color':
+            add_meta( meta, 'soft_min', 0.0 )
+            add_meta( meta, 'soft_max', 1.0 )
         d['meta'] = meta
         return d
 

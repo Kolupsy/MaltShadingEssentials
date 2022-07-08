@@ -47,4 +47,20 @@ vec4 color_invert( vec4 col, float fac ){
     return mix( col, result, fac );
 }
 
+vec4 color_paletting( vec4 col, vec4 palette[16] ){
+
+    // vec4 palette[4] = vec4[]( vec4( 1.0, 0.0, 0.0, 1.0 ), vec4( 0.0, 1.0, 0.0, 1.0 ), vec4( 0.0, 0.0, 1.0, 1.0 ), vec4( 0.0, 0.0, 0.0, 1.0 ));
+    vec4 result = vec4( 0.0, 0.0, 0.0, 1.0 );
+    float min_dist = 8.0;
+    for( int i; i < 16; i++ ){
+        vec4 palette_color = palette[i];
+        float dist = distance( col, palette_color );
+        if( dist < min_dist ){
+            result = palette_color;
+            min_dist = min( dist, min_dist );
+        }
+    }
+    return result;
+}
+
 #endif
