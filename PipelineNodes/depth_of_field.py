@@ -337,6 +337,5 @@ class EssentialsDOF( CustomPipelineNode ):
         )
 
         outputs[ 'Color' ] = self.get_output( 'COMBINE', 'Main' )
-        # outputs[ 'Color' ] = self.get_output( 'COC', 'Main' )
 
 NODE = EssentialsDOF

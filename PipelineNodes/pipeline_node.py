@@ -19,6 +19,7 @@ def get_param( glsl_type:str, default:Any ) -> Parameter:
         'vec2' : Parameter( default, Type.FLOAT, size = 2 ),
         'vec3' : Parameter( default, Type.FLOAT, size = 3 ),
         'vec4' : Parameter( default, Type.FLOAT, size = 4 ),
+        'str' : Parameter( default, Type.STRING ),
         'OTHER' : Parameter( default, Type.OTHER ),
     }[ glsl_type ]
 
