@@ -4,6 +4,7 @@
 - EssentialsBackground / EssentialsBackground : [background.py]
 - EssentialsBloom / EssentialsBloom : [bloom.py]
 - EssentialsClouds / EssentialsClouds : [clouds.py]
+- EssentialsDOF / EssentialsDOF : [depth_of_field.py]
 - EssentialsDithering / EssentialsDithering : [dithering.py]
 - EssentialsLensDistortion / EssentialsLensDistortion : [lens_distortion.py]
 - EssentialsLensFlare / EssentialsLensFlare : [lens_flare.py]
@@ -13,6 +14,7 @@
 
 **Input:**
 - Ambient Occlusion / MaltNodeAmbientOcclusion : [nodes/ambient_occlusion.py]
+- Curve View Mapping / MaltNodeCurveViewMapping : [nodes/curve_view_mapping.py]
 - Geometry / MaltNodeGeometry : [nodes/geometry.py]
 - Interior Mapping / MaltNodeInteriorMapping : [nodes/interior_mapping.py]
 - Layer Weight / MaltNodeLayerWeight : [nodes/layer_weight.py]
@@ -51,6 +53,7 @@
 - Hue Saturation Value / MaltNodeHueSaturation : [nodes/COLOR_collection.py]
 - Gamma / MaltNodeGamma : [nodes/COLOR_collection.py]
 - Invert / MaltNodeInvert : [nodes/COLOR_collection.py]
+- Color Palette / MaltNodeColorPalette : [nodes/color_palette.py]
 - Mix / MaltNodeMixRGB : [nodes/mix_rgb.py]
 
 **Texture:**
@@ -58,6 +61,7 @@
 - Blur / MaltNodeTexBlur : [nodes/tex_blur.py]
 - Environment Texture / MaltNodeTexEnvironment : [nodes/tex_environment.py]
 - Gradient Texture / MaltNodeTexGradient : [nodes/tex_gradient.py]
+- Hexagon Tiles / MaltNodeTexHexTiles : [nodes/tex_hex_tiles.py]
 - Image Texture / MaltNodeTexImage : [nodes/tex_image.py]
 - Normal Map / MaltNodeNormalMap : [nodes/tex_image.py]
 - Noise Texture / MaltNodeTextNoise : [nodes/tex_noise.py]
@@ -67,6 +71,8 @@
 - White Noise / MaltNodeTexWhiteNoise : [nodes/tex_white_noise.py]
 
 **Convertor:**
+- Bayer Dither / MaltNodeBayerDither : [nodes/bayer_dithering.py]
+- Clamp / MaltNodeClamp : [nodes/clamp.py]
 - Color Ramp / MaltNodeColorRamp : [nodes/color_ramp.py]
 - Lerp / MaltNodeLerp : [nodes/lerp.py]
 - Map Range / MaltNodeMapRange : [nodes/map_range.py]
