@@ -8,8 +8,8 @@
 
 #include "Lighting/Lighting.glsl"
 
-#include "../ShaderFunctions/noise_functions.internal.glsl"
-#include "../ShaderFunctions/Utils.internal.glsl"
+#include "noise_functions.internal.glsl"
+#include "Utils.internal.glsl"
 
 vec3 blend_in( vec3 color, float mask ){
     return clamp( color * vec3( mask ), 0.0, 1.0 );

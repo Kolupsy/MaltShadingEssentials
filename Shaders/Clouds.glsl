@@ -4,11 +4,11 @@
 
 #include "Node Utils/common.glsl"
 
-#include "../ShaderFunctions/Utils.internal.glsl"
-#include "../ShaderFunctions/Input.internal.glsl"
-#include "../ShaderFunctions/Vector.internal.glsl"
-#include "../ShaderFunctions/noise_functions.internal.glsl"
-#include "../ShaderFunctions/Textures.internal.glsl"
+#include "Utils.internal.glsl"
+#include "Input.internal.glsl"
+#include "Vector.internal.glsl"
+#include "noise_functions.internal.glsl"
+#include "Textures.internal.glsl"
 
 float smoother_step( float value, float from_min, float from_max, float to_min, float to_max ){
 

@@ -1,9 +1,44 @@
-import pathlib
 from pipeline_node import *
 
-_SHADER = None
+SKY_SHADER = None
 
-SHADERPATH = str( pathlib.Path( __file__ ).parent.parent.joinpath( 'Shaders', 'Skybox.glsl' ))
+SKY_SOURCE = generate_source('''
+
+#include "Node Utils/common.glsl"
+#include "Common/Color.glsl"
+#include "Common/Transform.glsl"
+
+#include "MixRGB.internal.glsl"
+
+uniform sampler2D color_texture;
+uniform sampler2D cloud_texture;
+
+uniform vec4 lower_sky;
+uniform vec4 upper_sky;
+uniform float exponent;
+uniform float cloud_occlusion_factor;
+
+layout (location = 0) out vec4 OUT_COLOR;
+layout (location = 1) out vec4 OUT_OCCLUSION;
+
+void main()
+{
+    PIXEL_SETUP_INPUT( );
+    vec2 uv = UV[0];
+    vec3 world_coords = view_direction( );
+
+    vec4 foreground = texture( color_texture, uv );
+    vec4 cloud_mask = texture( cloud_texture, uv );
+
+    float grad = clamp( pow( world_coords.z, exponent ), 0.0, 1.0 );
+    vec4 sky_gradient = mix( lower_sky, upper_sky, grad );
+    vec4 full_sky;
+    mix_soft_light( 1.0, sky_gradient, cloud_mask, full_sky );
+    
+    OUT_COLOR = alpha_blend( full_sky, foreground );
+    OUT_OCCLUSION = vec4( 0.0, 0.0, 0.0, max( foreground.a, cloud_mask.x * cloud_occlusion_factor ));
+}
+''')
 
 class EssentialsSky( CustomPipelineNode ):
 
@@ -37,11 +72,11 @@ class EssentialsSky( CustomPipelineNode ):
     
     def render( self, inputs: dict, outputs: dict ):
         
-        global _SHADER
-        if not _SHADER:
-            _SHADER = self.compile_shader( f'#include "{SHADERPATH}"' )
+        global SKY_SHADER
+        if not SKY_SHADER:
+            SKY_SHADER = self.compile_shader( SKY_SOURCE, include_paths = [get_shader_functions_path( )])
         
-        self.render_shader( _SHADER, self.get_render_target( 'MAIN' ),
+        self.render_shader( SKY_SHADER, self.get_render_target( 'MAIN' ),
             textures = {
                 'color_texture' : inputs[ 'Color' ],
                 'cloud_texture' : inputs[ 'Clouds' ]

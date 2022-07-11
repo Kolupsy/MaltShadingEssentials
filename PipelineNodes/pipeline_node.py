@@ -1,7 +1,7 @@
 from Malt.PipelineNode import PipelineNode
 from Malt.PipelineParameters import Parameter, Type
 from Malt.GL.Texture import Texture
-from Malt.GL.GL import GL_RGBA16F, GL_RGBA32F, GL_R8
+from Malt.GL.GL import GL_RGBA16F, GL_RGBA32F, GL_R16F, GL_RG16F, GL_RGB16F
 from Malt.GL.Shader import Shader
 from Malt.GL.RenderTarget import RenderTarget
 from Malt.Render import Lighting
@@ -26,7 +26,9 @@ class TextureFormat:
 
     RGBA16F = GL_RGBA16F
     RGBA32F = GL_RGBA32F
-    R8 = GL_R8
+    R16F = GL_R16F
+    RG16F = GL_RG16F
+    RGB16F = GL_RGB16F
 
 @dataclass
 class TextureTarget:
@@ -35,10 +37,16 @@ class TextureTarget:
     texture_format:str
     resolution:tuple[int, int]
 
-    def get_texture( self ):
-        return Texture( self.resolution, self.texture_format )
+    def get_real_resolution( self ):
+        return (
+            max( 0, int( self.resolution[0])),
+            max( 0, int( self.resolution[1]))
+        )
 
-class PipelineNodeExtended( PipelineNode ):
+    def get_texture( self ):
+        return Texture( self.get_real_resolution( ), self.texture_format )
+
+class CustomPipelineNode( PipelineNode ):
     
     @classmethod
     def static_inputs( cls ) -> dict[tuple[str, Any]]:
@@ -61,12 +69,9 @@ class PipelineNodeExtended( PipelineNode ):
         self.resolution = None
         self.texture_targets = {}
         self.render_targets = {}
-    
-    def compile_shader_from_source( self, source, include_paths = [], defines = []) -> Shader:
-        return self.pipeline.compile_shader_from_source( source = source, include_paths = include_paths, defines = defines )
 
-    def compile_shader( self, shader_code ) -> Shader:
-        return self.compile_shader_from_source( shader_code )
+    def compile_shader( self, shader_code, include_paths = [], defines = [] ) -> Shader:
+        return self.pipeline.compile_shader_from_source( source = shader_code, include_paths = include_paths, defines = defines )
     
     def get_render_targets( self, resolution:tuple[int,int]) -> dict[str,list[TextureTarget]]:
         return {}
@@ -119,31 +124,41 @@ class PipelineNodeExtended( PipelineNode ):
         
         self.render( inputs, outputs )
 
-class CustomPipelineNode( PipelineNodeExtended ):
-    '''Class Template for custom Pipeline nodes:
-    Override:
-        static_inputs
-        static_outputs
-        render
-        get_texture_targets
-    '''
+template_screen_shader = '''
 
-    @classmethod
-    def static_inputs( cls ) -> dict[str, tuple[str, Any]]:
-        return super( ).static_inputs( )
-    
-    @classmethod
-    def static_outputs( cls ) -> dict[str, tuple[str, Any]]:
-        return super( ).static_outputs( )
-    
-    def render( self, inputs: dict, outputs: dict ):
-        return super().render( inputs, outputs )
-    
-    def get_render_targets( self, resolution: tuple[int, int]) -> dict[str, list[TextureTarget]]:
-        return super( ).get_render_targets( resolution )
-    
-    def get_render_target( self, name ):
-        return super( ).get_render_target( name )
+#include "Common.glsl"
+
+#ifdef VERTEX_SHADER
+void main()
+{
+    DEFAULT_SCREEN_VERTEX_SHADER();
+}
+#endif
+
+#ifdef PIXEL_SHADER
+
+#INSERT_SCREEN_SHADER
+
+#endif
+'''
+
+def generate_source( code:str ):
+    return template_screen_shader.replace( '#INSERT_SCREEN_SHADER', code )
+
+def scale_res( resolution:tuple[int,int], scale:float):
+    return(
+        resolution[0] * scale,
+        resolution[1] * scale,
+    )
+
+def get_shader_source( shader_file_name: str ) -> str:
+    import pathlib
+    path = str( pathlib.Path( __file__ ).parent.parent.joinpath( 'Shaders', shader_file_name ))
+    return f'#include "{path}"'
+
+def get_shader_functions_path( ) -> str:
+    import pathlib
+    return str( pathlib.Path( __file__ ).parent.parent.joinpath( 'ShaderFunctions' ))
 
 class DummyPipelineNode( PipelineNode ):
 
@@ -153,5 +168,5 @@ class DummyPipelineNode( PipelineNode ):
         reflection[ 'meta' ][ 'internal' ] = True
         return reflection
 
-__all__ = [ 'Any', 'CustomPipelineNode', 'TextureTarget', 'TextureFormat' ]
+__all__ = [ 'Any', 'CustomPipelineNode', 'TextureTarget', 'TextureFormat', 'generate_source', 'get_shader_source', 'get_shader_functions_path', 'scale_res' ]
 NODE = DummyPipelineNode

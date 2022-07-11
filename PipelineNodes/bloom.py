@@ -1,69 +1,84 @@
-# from Malt.PipelineNode import PipelineNode
-# from Malt.PipelineParameters import Parameter, Type
-# from Malt.GL.Texture import Texture
-# from Malt.GL.GL import GL_RGBA16F
-# from Malt.GL.RenderTarget import RenderTarget
 
-import pathlib
 from pipeline_node import *
 
-_SHADER = None
+PREPASS_SHADER = None
+BLUR_SHADER = None
+COMBINE_SHADER = None
 
-SHADERPATH = str( pathlib.Path( __file__ ).parent.parent.joinpath( 'Shaders', 'Bloom.glsl' ))
+TEXTUREBLUR = generate_source('''
+#include "Filters/Blur.glsl"
 
-# class EssentialsBloom( PipelineNode ):
+uniform sampler2D color_texture;
+uniform float blur_radius = 7.0;
 
-#     def __init__( self, pipeline ):
-#         PipelineNode.__init__( self, pipeline )
-#         self.resolution = None
+layout (location = 0) out vec4 RESULT;
+
+void main()
+{
+    PIXEL_SETUP_INPUT();
+    vec2 uv = UV[0];
     
-#     @classmethod
-#     def reflect_inputs( cls ):
-#         return {
-#             'Color' : Parameter( '', Type.TEXTURE ),
-#             'Radius' : Parameter( 0.5, Type.FLOAT ),
-#             'Samples' : Parameter( 64, Type.INT ),
-#             'Exponent' : Parameter( 2.0, Type.FLOAT ),
-#             'Intensity' : Parameter( 5.0, Type.FLOAT ),
-#         }
+    // vec4 screen_color = box_blur( color_texture, uv, blur_radius, false );
+    vec4 screen_color = gaussian_blur( color_texture, uv, blur_radius, 3.0 );
     
-#     @classmethod
-#     def reflect_outputs( cls ):
-#         return {
-#             'Color' : Parameter( '', Type.TEXTURE )
-#         }
+    RESULT = screen_color;
+}
+''')
+
+PREPASS = generate_source('''
+
+#include "Common/Color.glsl"
+
+uniform sampler2D color_texture;
+uniform float threshold = 0.35;
+
+layout (location = 0) out vec4 RESULT;
+
+void main()
+{
+    PIXEL_SETUP_INPUT();
+    vec2 uv = UV[0];
     
-#     def setup_render_targets( self, resolution ):
-#         self.resolution = resolution
-#         self.texture_targets = {}
-#         self.texture_targets[ 'COLOR' ] = Texture( resolution, GL_RGBA16F )
-#         self.render_target = RenderTarget([*self.texture_targets.values( )])
+    vec4 color = texture( color_texture, uv );
+    float luma = rgb_to_hsv( color.rgb ).z;
+
+    color.rgb -= vec3( threshold );
+    color = clamp( color, 0.0, 999.0 );
+
+    RESULT = color;
+}
+''')
+
+COMBINEPASS = generate_source('''
+
+uniform sampler2D background;
+uniform sampler2D blur_1;
+uniform sampler2D blur_2;
+uniform sampler2D blur_3;
+uniform sampler2D blur_4;
+uniform sampler2D blur_5;
+uniform sampler2D blur_6;
+uniform sampler2D blur_7;
+
+uniform float intensity;
+
+layout (location = 0) out vec4 RESULT;
+
+void main()
+{
+    PIXEL_SETUP_INPUT();
+    vec2 uv = UV[0];
+
+    vec4 back_color = texture( background, uv );
+    sampler2D blur_images[7] = sampler2D[]( blur_1, blur_2, blur_3, blur_4, blur_5, blur_6, blur_7 );
+    vec4 bloom;
+    for( int i = 0; i < 7; ++i ){
+        bloom.xyz += texture( blur_images[ i ], uv ).xyz * vec3( intensity );
+    }
     
-#     def execute( self, parameters ):
-#         inputs = parameters[ 'IN' ]
-#         outputs = parameters[ 'OUT' ]
-
-#         if self.pipeline.resolution != self.resolution:
-#             self.setup_render_targets( self.pipeline.resolution )
-        
-#         global _SHADER
-#         if _SHADER is None:
-#             self.compile_shader( )
-        
-#         _SHADER.textures[ 'color_texture' ] = inputs[ 'Color' ]
-#         _SHADER.uniforms[ 'bloom_settings' ].set_value(( inputs['Exponent'], inputs['Intensity'], inputs['Radius']))
-#         _SHADER.uniforms[ 'samples' ].set_value( inputs['Samples'])
-#         self.pipeline.common_buffer.shader_callback( _SHADER )
-#         self.pipeline.draw_screen_pass( _SHADER, self.render_target )
-            
-#         outputs[ 'Color' ] = self.texture_targets[ 'COLOR' ]
-
-#     def compile_shader_from_source( self, source, include_paths = [], defines = []):
-#         return self.pipeline.compile_shader_from_source( source = source, include_paths = include_paths, defines = defines )
-
-#     def compile_shader( self ):
-#         global _SHADER
-#         _SHADER = self.compile_shader_from_source( f'#include "{BLOOMPATH}"' )
+    RESULT = back_color + bloom;
+}
+''')
 
 class EssentialsBloom( CustomPipelineNode ):
 
@@ -71,36 +86,97 @@ class EssentialsBloom( CustomPipelineNode ):
     def static_inputs( cls ) -> dict[tuple[str, Any]]:
         return{
             'Color' : ( 'sampler2D', '' ),
-            'Radius' : ( 'float', 0.5 ),
-            'Samples' : ( 'int', 64 ),
-            'Exponent' : ( 'float', 2.0 ),
-            'Intensity' : ( 'float', 5.0 )
+            'Threshold' : ( 'float', 0.7 ),
+            'Intensity' : ( 'float', 1.0 ),
         }
-    
     @classmethod
     def static_outputs( cls ) -> dict[tuple[str, Any]]:
         return{
             'Color' : ( 'sampler2D', '' ),
         }
     
-    def get_render_targets( self, resolution: tuple[int, int]) -> dict[str, list[TextureTarget]]:
-        return {
-            'MAIN' : [ TextureTarget( 'COLOR', TextureFormat.RGBA16F, resolution )]
+    def get_render_targets(self, resolution: tuple[int, int]) -> dict[str, list[TextureTarget]]:
+        return{
+            'PREPASS' : [ TextureTarget( 'COLOR', TextureFormat.RGBA16F,  resolution )],
+            'BLUR_1' : [ TextureTarget( 'COLOR', TextureFormat.RGBA16F, scale_res( resolution, 1/2 ))],
+            'BLUR_2' : [ TextureTarget( 'COLOR', TextureFormat.RGBA16F, scale_res( resolution, 1/4 ))],
+            'BLUR_3' : [ TextureTarget( 'COLOR', TextureFormat.RGBA16F, scale_res( resolution, 1/8 ))],
+            'BLUR_4' : [ TextureTarget( 'COLOR', TextureFormat.RGBA16F, scale_res( resolution, 1/8 ))],
+            'BLUR_5' : [ TextureTarget( 'COLOR', TextureFormat.RGBA16F, scale_res( resolution, 1/16 ))],
+            'BLUR_6' : [ TextureTarget( 'COLOR', TextureFormat.RGBA16F, scale_res( resolution, 1/32 ))],
+            'BLUR_7' : [ TextureTarget( 'COLOR', TextureFormat.RGBA16F, scale_res( resolution, 1/64 ))],
+            'COMBINE' : [ TextureTarget( 'COLOR', TextureFormat.RGBA16F, resolution )],
         }
     
     def render( self, inputs: dict, outputs: dict ):
         
-        global _SHADER
-        if not _SHADER:
-            _SHADER = self.compile_shader( f'#include "{SHADERPATH}"' )
+        global PREPASS_SHADER, BLUR_SHADER, COMBINE_SHADER
+        if not PREPASS_SHADER:
+            PREPASS_SHADER = self.compile_shader( PREPASS )
+        if not BLUR_SHADER:
+            BLUR_SHADER = self.compile_shader( TEXTUREBLUR )
+        if not COMBINE_SHADER:
+            COMBINE_SHADER = self.compile_shader( COMBINEPASS )
         
-        self.render_shader( _SHADER, self.get_render_target( 'MAIN' ),
+        if inputs[ 'Intensity' ] <= 0.0:
+            outputs[ 'Color' ] = inputs[ 'Color' ]
+            return
+        
+        #Prepass - Set the image to 0 at a certain threshold
+        self.render_shader( PREPASS_SHADER, self.get_render_target( 'PREPASS' ),
             textures = { 'color_texture' : inputs[ 'Color' ]},
+            uniforms = { 'threshold' : inputs[ 'Threshold' ]},
+        )
+
+        #First blur pass at 1/2 screen resolution
+        self.render_shader( BLUR_SHADER, self.get_render_target( 'BLUR_1' ),
+            textures = { 'color_texture' : self.get_output( 'PREPASS', 'COLOR' )}
+        )
+
+        #Second blur pass at 1/4 screen resolution
+        self.render_shader( BLUR_SHADER, self.get_render_target( 'BLUR_2' ),
+            textures = { 'color_texture' : self.get_output( 'BLUR_1', 'COLOR' )}
+        )
+
+        #Third blur pass at 1/4 screen resolution
+        self.render_shader( BLUR_SHADER, self.get_render_target( 'BLUR_3' ),
+            textures = { 'color_texture' : self.get_output( 'BLUR_2', 'COLOR' )}
+        )
+        #Fourth blur pass at 1/8 screen resolution
+        self.render_shader( BLUR_SHADER, self.get_render_target( 'BLUR_4' ),
+            textures = { 'color_texture' : self.get_output( 'BLUR_3', 'COLOR' )}
+        )
+        #Fifth blur pass at 1/16 screen resolution
+        self.render_shader( BLUR_SHADER, self.get_render_target( 'BLUR_5' ),
+            textures = { 'color_texture' : self.get_output( 'BLUR_4', 'COLOR' )}
+        )
+        #Sixth blur pass at 1/32 screen resolution
+        self.render_shader( BLUR_SHADER, self.get_render_target( 'BLUR_6' ),
+            textures = { 'color_texture' : self.get_output( 'BLUR_5', 'COLOR' )}
+        )
+        #Seventh blur pass at 1/64 screen resolution
+        self.render_shader( BLUR_SHADER, self.get_render_target( 'BLUR_7' ),
+            textures = { 'color_texture' : self.get_output( 'BLUR_6', 'COLOR' )}
+        )
+
+        self.render_shader( COMBINE_SHADER, self.get_render_target( 'COMBINE' ),
+            textures = {
+                'background' : inputs[ 'Color' ],
+                'blur_1' : self.get_output( 'BLUR_1', 'COLOR' ),
+                'blur_2' : self.get_output( 'BLUR_2', 'COLOR' ),
+                'blur_3' : self.get_output( 'BLUR_3', 'COLOR' ),
+                'blur_4' : self.get_output( 'BLUR_4', 'COLOR' ),
+                'blur_5' : self.get_output( 'BLUR_5', 'COLOR' ),
+                'blur_6' : self.get_output( 'BLUR_6', 'COLOR' ),
+                'blur_7' : self.get_output( 'BLUR_7', 'COLOR' ),
+            },
             uniforms = {
-                'bloom_settings' : ( inputs[ 'Exponent' ], inputs[ 'Intensity' ], inputs[ 'Radius' ]),
-                'samples' : inputs[ 'Samples' ]
+                'intensity' : inputs[ 'Intensity' ]
             }
         )
-        outputs[ 'Color' ] = self.get_output( 'MAIN', 'COLOR' )
+
+        outputs[ 'Color' ] = self.get_output( 'COMBINE', 'COLOR' )
+
+
 
 NODE = EssentialsBloom

@@ -39,7 +39,7 @@ float light_intensity_coef( Light light, vec3 light_factors, float view_distance
             break;
         case 3: //Spot
             result = light_factors.z;
-            result *= dot( light.direction, transform_normal( CAMERA, vec3( 0, 0, 1 )));
+            result *= dot( light.direction, transform_normal( CAMERA, vec3( 0, 0, -1 )));
             result *= 1.0 / pow( view_distance, 2.0 );
             break;
     }

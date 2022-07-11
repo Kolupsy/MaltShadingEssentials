@@ -1,9 +1,36 @@
-import pathlib
 from pipeline_node import *
 
-_SHADER = None
+DITHER_SHADER = None
 
-SHADERPATH = str( pathlib.Path( __file__ ).parent.parent.joinpath( 'Shaders', 'Dithering.glsl' ))
+DITHER_SOURCE = generate_source('''
+
+#include "Filters/Blur.glsl"
+#include "Node Utils/common.glsl"
+// #include "../ShaderFunctions/Color.internal.glsl"
+#include "Color.internal.glsl"
+
+uniform sampler2D color_texture;
+uniform sampler2D threshold_texture;
+uniform float gamma;
+uniform vec4 darker_color;
+uniform vec4 lighter_color;
+
+layout (location = 0) out vec4 OUT_COLOR;
+
+void main()
+{
+    PIXEL_SETUP_INPUT();
+    vec2 uv = UV[0];
+    vec4 color = texture( color_texture, uv );
+    color = gamma_correction( color, gamma );
+    float gradient = ( color.x + color.y + color.z ) / 3.0;
+    
+    vec2 noise_uv = uv * ( render_resolution( ) / vec2( textureSize( threshold_texture, 0 ) ));
+    float threshold = texture(  threshold_texture, noise_uv ).x;
+
+    OUT_COLOR = mix( darker_color, lighter_color, ( gradient > threshold ) ? 1.0 : 0.0 );
+}
+''')
 
 class EssentialsDithering( CustomPipelineNode ):
 
@@ -30,11 +57,11 @@ class EssentialsDithering( CustomPipelineNode ):
 
     def render( self, inputs: dict, outputs: dict ):
         
-        global _SHADER
-        if not _SHADER:
-            _SHADER = self.compile_shader( f'#include "{SHADERPATH}"' )
+        global DITHER_SHADER
+        if not DITHER_SHADER:
+            DITHER_SHADER = self.compile_shader( DITHER_SOURCE, include_paths = [get_shader_functions_path( )])
         
-        self.render_shader( _SHADER, self.get_render_target( 'MAIN' ),
+        self.render_shader( DITHER_SHADER, self.get_render_target( 'MAIN' ),
             textures = {
                 'color_texture' : inputs[ 'Color' ],
                 'threshold_texture' : inputs[ 'Noise' ],

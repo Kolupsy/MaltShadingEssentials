@@ -1,9 +1,6 @@
-import pathlib
 from pipeline_node import *
 
-_SHADER = None
-
-SHADERPATH = str( pathlib.Path( __file__ ).parent.parent.joinpath( 'Shaders', 'SunFlare.glsl' ))
+SF_SHADER = None
 
 class EssentialsSunFlare( CustomPipelineNode ):
 
@@ -29,13 +26,13 @@ class EssentialsSunFlare( CustomPipelineNode ):
     
     def render( self, inputs: dict, outputs: dict ):
         
-        global _SHADER
-        if not _SHADER:
-            _SHADER = self.compile_shader( f'#include "{SHADERPATH}"' )
+        global SF_SHADER
+        if not SF_SHADER:
+            SF_SHADER = self.compile_shader( get_shader_source( 'SunFlare.glsl' ), include_paths = [get_shader_functions_path( )])
 
-        self.setup_lights_buffer( _SHADER, inputs[ 'Scene' ])
+        self.setup_lights_buffer( SF_SHADER, inputs[ 'Scene' ])
         
-        self.render_shader( _SHADER, self.get_render_target( 'MAIN' ),
+        self.render_shader( SF_SHADER, self.get_render_target( 'MAIN' ),
             textures = {
                 'color_texture' : inputs[ 'Color' ],
                 'occlusion_texture' : inputs[ 'Occlusion' ]

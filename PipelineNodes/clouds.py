@@ -1,9 +1,6 @@
-import pathlib
 from pipeline_node import *
 
-_SHADER = None
-
-SHADERPATH = str( pathlib.Path( __file__ ).parent.parent.joinpath( 'Shaders', 'Clouds.glsl' ))
+CLOUD_SHADER = None
 
 class EssentialsClouds( CustomPipelineNode ):
 
@@ -29,11 +26,13 @@ class EssentialsClouds( CustomPipelineNode ):
     
     def render( self, inputs: dict, outputs: dict ):
         
-        global _SHADER
-        if not _SHADER:
-            _SHADER = self.compile_shader( f'#include "{SHADERPATH}"' )
+        global CLOUD_SHADER
+        if not CLOUD_SHADER:
+            CLOUD_SHADER = self.compile_shader( 
+                get_shader_source( 'Clouds.glsl' ),
+                include_paths = [ get_shader_functions_path( )])
         
-        self.render_shader( _SHADER, self.get_render_target( 'MAIN' ),
+        self.render_shader( CLOUD_SHADER, self.get_render_target( 'MAIN' ),
             uniforms = {
                 'main_cloud_strength' : inputs[ 'Main Clouds' ],
                 'streak_cloud_strength' : inputs[ 'Streaky Clouds' ],
