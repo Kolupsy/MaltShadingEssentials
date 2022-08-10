@@ -1,5 +1,6 @@
 from pipeline_node import *
 
+# UV distortion based on: https://www.shadertoy.com/view/4lSGRw
 DISTORTION_SHADER = None
 DISTORTION_SOURCE = generate_source('''
 
