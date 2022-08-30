@@ -55,7 +55,7 @@ def register_categories( register ):
     else:
         unregister_node_categories( PACKAGE_ID )
 
-CLASSES = get_all_nodes( )
-REGISTER = [
-    register_categories,
-]
+# CLASSES = get_all_nodes( )
+# REGISTER = [
+#     register_categories,
+# ]

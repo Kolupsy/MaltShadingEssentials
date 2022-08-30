@@ -74,14 +74,13 @@ class CustomPipelineNode( PipelineNode ):
     def compile_shader( self, shader_code, include_paths = [], defines = [] ) -> Shader:
         return self.pipeline.compile_shader_from_source( source = shader_code, include_paths = include_paths, defines = defines )
     
-    def get_render_targets( self, resolution:tuple[int,int]) -> dict[str,list[TextureTarget]]:
+    def get_render_targets( self, resolution:tuple[int,int], inputs ) -> dict[str,list[TextureTarget]]:
         return {}
     
-    def setup_render_targets( self, resolution ):
+    def setup_render_targets( self, resolution, inputs ):
         self.resolution = resolution
-        self.texture_targets = {}
 
-        for name, textures in self.get_render_targets( resolution ).items( ):
+        for name, textures in self.get_render_targets( resolution, inputs ).items( ):
 
             render_textures = { t.name : t.get_texture( ) for t in textures }
 
@@ -121,7 +120,7 @@ class CustomPipelineNode( PipelineNode ):
         outputs = parameters[ 'OUT' ]
 
         if self.pipeline.resolution != self.resolution:
-            self.setup_render_targets( self.pipeline.resolution )
+            self.setup_render_targets( self.pipeline.resolution, inputs )
         
         self.render( inputs, outputs )
 

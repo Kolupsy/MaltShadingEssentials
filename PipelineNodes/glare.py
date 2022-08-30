@@ -113,7 +113,7 @@ class EssentialsGlare( CustomPipelineNode ):
             'Color' : ( 'sampler2D', '' ),
         }
     
-    def get_render_targets( self, resolution: tuple[int, int]) -> dict[str, list[TextureTarget]]:
+    def get_render_targets( self, resolution: tuple[int, int], inputs) -> dict[str, list[TextureTarget]]:
         return{
             'LIMIT' : [ TextureTarget( 'Main', TextureFormat.RGBA16F, scale_res( resolution, 1 ))],
             'BLUR_1' : [ TextureTarget( 'Main', TextureFormat.RGBA16F, resolution )],

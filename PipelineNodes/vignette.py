@@ -3,8 +3,6 @@ from pipeline_node import *
 VIGNETTE_SHADER = None
 VIGNETTE_SOURCE = generate_source('''
 
-#include "Math.internal.glsl"
-
 uniform sampler2D color_texture;
 uniform vec4 vignette_color = vec4( 0.0, 0.0, 0.0, 1.0 );
 uniform float radius = 1.0;
@@ -32,7 +30,7 @@ void main()
             l = length( c * aspect ); break;
         case 2:
             c = abs( c );
-            math_smoothmax( c.x, c.y, radius * 0.5, l );
+            max( c.x, c.y );
             break;
     }
 
@@ -60,7 +58,7 @@ class EssentialsVignette( CustomPipelineNode ):
             'Color' : ( 'sampler2D', '' ),
         }
     
-    def get_render_targets( self, resolution: tuple[int, int]) -> dict[str, list[TextureTarget]]:
+    def get_render_targets( self, resolution: tuple[int, int], inputs) -> dict[str, list[TextureTarget]]:
         return{
             'VIGNETTE' : [ TextureTarget( 'Main', TextureFormat.RGBA16F, resolution )]
         }

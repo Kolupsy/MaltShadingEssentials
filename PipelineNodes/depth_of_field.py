@@ -268,7 +268,7 @@ class EssentialsDOF( CustomPipelineNode ):
             'Color' : ( 'sampler2D', '' )
         }
     
-    def get_render_targets( self, resolution: tuple[int, int]) -> dict[str, list[TextureTarget]]:
+    def get_render_targets( self, resolution: tuple[int, int], inputs) -> dict[str, list[TextureTarget]]:
         return {
             'COC' : [ TextureTarget( 'Main', TextureFormat.R16F, resolution )],
             'COLOR_COC' : [ TextureTarget( 'Color', TextureFormat.RGBA32F, scale_res( resolution, 1/2 ))],

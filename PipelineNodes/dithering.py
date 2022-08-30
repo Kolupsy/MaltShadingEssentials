@@ -49,7 +49,7 @@ class EssentialsDithering( CustomPipelineNode ):
             'Color' : ( 'sampler2D', '' )
         }
     
-    def get_render_targets( self, resolution: tuple[int, int]) -> dict[str, TextureTarget]:
+    def get_render_targets( self, resolution: tuple[int, int], inputs) -> dict[str, TextureTarget]:
         return {
             'MAIN' : [ TextureTarget( 'COLOR', TextureFormat.RGBA16F, resolution )]
         }

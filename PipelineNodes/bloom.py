@@ -95,7 +95,7 @@ class EssentialsBloom( CustomPipelineNode ):
             'Color' : ( 'sampler2D', '' ),
         }
     
-    def get_render_targets(self, resolution: tuple[int, int]) -> dict[str, list[TextureTarget]]:
+    def get_render_targets(self, resolution: tuple[int, int], inputs) -> dict[str, list[TextureTarget]]:
         return{
             'PREPASS' : [ TextureTarget( 'COLOR', TextureFormat.RGBA16F,  resolution )],
             'BLUR_1' : [ TextureTarget( 'COLOR', TextureFormat.RGBA16F, scale_res( resolution, 1/2 ))],
