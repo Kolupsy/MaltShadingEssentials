@@ -2,8 +2,6 @@
 #define SHADINGESSENTIALS_TEXTURES_GLSL
 
 #include "noise_functions.internal.glsl"
-#include "Input.internal.glsl"
-#include "Math.internal.glsl"
 
 #include "Node Utils/float.glsl"
 #include "Node Utils/vec2.glsl"
@@ -1013,87 +1011,6 @@ void voronoi_texture_n_sphere_radius_4d(vec4 coord,
   outRadius = distance(closestPointToClosestPoint, closestPoint) / 2.0;
 }
 
-vec4 sampler2D_sample_environment( sampler2D texture, vec3 vector ){
-    vec2 uv = hdri_uv( vector );
-    return sampler2D_sample_nearest( texture, uv );
-}
-
-vec4 texture_flow( sampler2D texture, vec2 uv, vec2 flow, float progression, int samples ){
-  vec4 result;
-  float fraction = 1.0 / float( samples );
-  for( int i = 0; i < samples; i++ ){
-    float flow_scale = fract( progression - i * fraction );
-    vec4 color = sampler2D_sample( texture, uv - flow * vec2( flow_scale ));
-
-    float range = fract( progression - ( float( i ) / samples )) * samples;
-    float pingpong;
-    math_pingpong( range, 1.0, 0, pingpong );
-    float bounds = ( range > 0 && range < 2.0 ) ? 1.0 : 0.0;
-    result += color * pingpong * bounds;
-  }
-  return result;
-}
-
-float texture_wave_sine( float mapping, float scale, float phase ){
-  mapping = mapping * scale * PI * 2 + phase;
-  return sin( mapping - PI / 2 ) * 0.5 + 0.5;
-}
-float texture_wave_saw( float mapping, float scale, float phase ){
-  mapping = mapping * scale + phase;
-  return fract( mapping );
-}
-float texture_wave_triangle( float mapping, float scale, float phase ){
-  mapping = mapping * scale + phase;
-  float result = fract( mapping ) - 0.5;
-  result = 1 - ( abs( result ) * 2 );
-  return result;
-}
-
-float texture_gradient_linear( float mapping ){
-  return clamp( mapping, 0.0, 1.0 );
-}
-float texture_gradient_quadratic( float mapping ){
-  return clamp( mapping * mapping, 0.0, 1.0 );
-}
-float texture_gradient_easing( float mapping ){
-  float r = clamp( mapping, 0.0, 1.0 );
-  float t = r * r;
-  return ( 3.0 * t - 2.0 * t * r );
-}
-float texture_gradient_diagonal( vec2 uv ){
-  return ( uv.x + uv.y ) * 0.5;
-}
-float texture_gradient_spherical( vec3 vector ){
-  float r = max( 0.9999999 - sqrt( vector.x * vector.x + vector.y * vector.y + vector.z + vector.z ), 0.0 );
-  return r;
-}
-float texture_gradient_quadratic_sphere( vec3 vector ){
-  float r = max( 0.9999999 - sqrt( vector.x * vector.x + vector.y * vector.y + vector.z + vector.z ), 0.0 );
-  return r * r;
-}
-float texture_gradient_radial( vec2 uv ){
-  return atan( uv.y, uv.x ) / ( PI * 2 ) + 0.5;
-}
-
-vec4 texture_white_noise_1d( float w ){
-  vec3 vector = hash_float_to_vec3( w );
-  float value = hash_vec2_to_float( vec2( w, 1.0 ));
-  return vec4( vector, value );
-}
-vec4 texture_white_noise_2d( vec2 uv ){
-  vec3 vector = hash_vec2_to_vec3( uv );
-  float value = hash_vec3_to_float( vec3( uv, 2.0 ));
-  return vec4( vector, value );
-}
-vec4 texture_white_noise_3d( vec3 vector ){
-  vec3 out_vector =  hash_vec3_to_vec3( vector );
-  float value = hash_vec4_to_float( vec4( vector, 3.0 ));
-  return vec4( out_vector, value );
-}
-vec4 texture_white_noise_4d( vec4 color ){
-  return hash_vec4_to_vec4( color );
-}
-
 // Based on: https://www.youtube.com/watch?v=mLRqhcPIjg8
 void hexagon_tiles( vec2 uv, float scale, float tile_size, out vec2 tile_uv, out vec2 tile_pos, out float tile_mask, out float tile_gradient, out vec4 rand_id ){
 
@@ -1122,64 +1039,4 @@ void hexagon_tiles( vec2 uv, float scale, float tile_size, out vec2 tile_uv, out
   rand_id = vec4( hash_vec2_to_vec3( tile_pos ), hash_vec2_to_float( tile_pos + vec2( 1.0 )));
 }
 
-float bayer_mat2( int index ){
-  int matrix[4] = int[4](
-    0,2,
-    3,1
-  );
-  return float( matrix[index]) / 4.0;
-}
-
-float bayer_mat3( int index ){
-  int matrix[9] = int[9](
-    0,7,3,
-    6,5,2,
-    4,1,8
-  );
-  return float( matrix[index]) / 9.0;
-}
-
-float bayer_mat4( int index ){
-  int matrix[16] = int[16](
-    0,8,2,10,
-    12,4,14,6,
-    3,11,1,9,
-    15,7,13,5
-  );
-  return float( matrix[index]) / 16.0;
-}
-
-float bayer_mat8( int index ){
-  int matrix[64] = int[64](
-    0,32,8,40,2,34,10,42,
-    48,16,56,24,50,18,58,26,
-    12,44,4,36,14,46,6,38,
-    60,28,53,20,62,30,54,22,
-    3,35,11,43,1,33,9,41,
-    51,19,59,27,49,17,57,25,
-    15,47,7,39,13,45,5,37,
-    63,31,55,23,61,29,53,21
-  );
-  return float( matrix[index]) / 64.0;
-}
-
-int bayer_index( vec2 uv, int size ){
-  uv = floor( abs(vec2( 0 - uv.x, 1 - uv.y )) * vec2( float( size )));
-  int index = int( uv.x ) + size * int( uv.y );
-  return index;
-}
-
-float bayer_dithering2( vec2 uv ){
-  return bayer_mat2( bayer_index( uv, 2 ));
-}
-float bayer_dithering3( vec2 uv ){
-  return bayer_mat3( bayer_index( uv, 3 ));
-}
-float bayer_dithering4( vec2 uv ){
-  return bayer_mat4( bayer_index( uv, 4 ));
-}
-float bayer_dithering8( vec2 uv ){
-  return bayer_mat8( bayer_index( uv, 8 ));
-}
-
-#endif
+#endif 
