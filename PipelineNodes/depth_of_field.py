@@ -146,7 +146,6 @@ BOKEH_SOURCE_ALT = generate_source('''
 uniform sampler2D color_texture;
 uniform float bokeh_radius = 4.0;
 uniform int kernel_samples = 22;
-uniform float GOLDEN_ANGLE = 2.3998;
 
 layout (location = 0) out vec4 BOKEH;
 layout (location = 1) out float OUT_COC;

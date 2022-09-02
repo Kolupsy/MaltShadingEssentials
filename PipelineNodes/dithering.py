@@ -6,12 +6,11 @@ DITHER_SOURCE = generate_source('''
 
 #include "Filters/Blur.glsl"
 #include "Node Utils/common.glsl"
-// #include "../ShaderFunctions/Color.internal.glsl"
-#include "Color.internal.glsl"
+#include "Common/Color.glsl"
 
 uniform sampler2D color_texture;
 uniform sampler2D threshold_texture;
-uniform float gamma;
+uniform float gamma_value;
 uniform vec4 darker_color;
 uniform vec4 lighter_color;
 
@@ -22,7 +21,7 @@ void main()
     PIXEL_SETUP_INPUT();
     vec2 uv = UV[0];
     vec4 color = texture( color_texture, uv );
-    color = gamma_correction( color, gamma );
+    color = gamma( color, gamma_value );
     float gradient = ( color.x + color.y + color.z ) / 3.0;
     
     vec2 noise_uv = uv * ( render_resolution( ) / vec2( textureSize( threshold_texture, 0 ) ));
@@ -67,7 +66,7 @@ class EssentialsDithering( CustomPipelineNode ):
                 'threshold_texture' : inputs[ 'Noise' ],
             },
             uniforms = {
-                'gamma' : inputs[ 'Gamma' ],
+                'gamma_value' : inputs[ 'Gamma' ],
                 'darker_color' : inputs[ 'Darker' ],
                 'lighter_color' : inputs[ 'Lighter' ],
             }

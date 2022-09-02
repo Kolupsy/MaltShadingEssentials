@@ -8,13 +8,12 @@ DR_SOURCE = generate_source(
 uniform sampler2D tex;
 uniform bool is_init = false;
 
-layout (location = 0) out vec2 RESULT;
+layout (location = 0) out float RESULT;
 
 void main()
 {
     PIXEL_SETUP_INPUT();
-    RESULT = vec2(0.0);
-    RESULT = vec2(9999.0, -9999.0); // stores x=min  y=max
+    RESULT = 0.0;
     vec2 texel = 1.0 / textureSize(tex, 0);
 
     int radius = 2;
@@ -24,22 +23,19 @@ void main()
         for(int v =-radius; v <= radius; v++)
         {
             vec2 offset = vec2(u,v) * texel;
-            vec2 l = texture(tex, UV[0] + offset).rg;
+            float l;
             if(is_init)
             {
-                l = vec2(luma(texture(tex, UV[0] + offset).rgb));
+                l = luma(texture(tex, UV[0] + offset).rgb);
             }
             else
             {
-                l = texture(tex, UV[0] + offset).rg;
+                l = texture(tex, UV[0] + offset).x;
             }
-            
-            RESULT = vec2(
-                min(RESULT.x, l.x),
-                max(RESULT.y, l.y)
-            );
+            RESULT += l;
         }
-    }  
+    }
+    RESULT /= pow(2 * float(radius) + 1.0, 2);
 }
 """)
 
@@ -49,6 +45,7 @@ COMP_SOURCE = generate_source(
 
 uniform sampler2D color_tex;
 uniform sampler2D dr_tex;
+uniform float auto_exposure = 1.0;
 
 layout (location = 0) out vec4 RESULT;
 
@@ -58,26 +55,20 @@ void main()
 
     ivec2 dr_resolution = textureSize(dr_tex, 0);
     vec2 dr_texel = 1.0 / vec2(dr_resolution);
-    vec2 dynamic_range = vec2(9999.0, -9999.0);
+    float brightness = 0.0;
 
     for(int u=0; u < dr_resolution.x; u++)
     {
         for(int v=0; v < dr_resolution.y; v++)
         {
             vec2 offset = vec2(u,v) * dr_texel;
-            vec2 s = texture(dr_tex, offset).rg;
-            dynamic_range = vec2(
-                min(dynamic_range.x, s.x),
-                max(dynamic_range.y, s.y)
-            );
+            float s = texture(dr_tex, offset).x;
+            brightness += s;
         }
     }
+    float avg_brightness = brightness / dr_resolution.x / dr_resolution.y;
     vec4 color = texture(color_tex, UV[0]);
-    color.rgb = map_range(
-        color.rgb, 
-        vec3(0.0),
-        vec3(dynamic_range.y),
-        vec3(0.0), vec3(1.0));
+    color.rgb /= 2 * mix(0.5, avg_brightness, saturate(auto_exposure));
     RESULT = color;
 }
 
@@ -88,7 +79,8 @@ class ToneMapper(CustomPipelineNode):
     @classmethod
     def static_inputs(cls) -> dict[tuple[str, Any]]:
         return {
-            'Color': ('sampler2D', '')
+            'Color': ('sampler2D', ''),
+            'Auto Exposure': ('float', 1.0),
         }
     
     @classmethod
@@ -99,10 +91,10 @@ class ToneMapper(CustomPipelineNode):
     
     def get_render_targets(self, resolution: tuple[int, int], inputs) -> dict[str, list[TextureTarget]]:
         return {
-            'DR_1': [TextureTarget('MAIN', TextureFormat.RG16F, resolution)],
-            'DR_2': [TextureTarget('MAIN', TextureFormat.RG16F, scale_res(resolution, 1/4))],
-            'DR_3': [TextureTarget('MAIN', TextureFormat.RG16F, scale_res(resolution, 1/16))],
-            'DR_4': [TextureTarget('MAIN', TextureFormat.RG16F, scale_res(resolution, 1/64))],
+            'DR_1': [TextureTarget('MAIN', TextureFormat.R16F, resolution)],
+            'DR_2': [TextureTarget('MAIN', TextureFormat.R16F, scale_res(resolution, 1/4))],
+            'DR_3': [TextureTarget('MAIN', TextureFormat.R16F, scale_res(resolution, 1/16))],
+            'DR_4': [TextureTarget('MAIN', TextureFormat.R16F, scale_res(resolution, 1/64))],
             'Comp': [TextureTarget('MAIN', TextureFormat.RGBA16F, resolution)],
         }
 
@@ -112,6 +104,10 @@ class ToneMapper(CustomPipelineNode):
             DR_SHADER = self.compile_shader(DR_SOURCE)
         if not COMP_SHADER:
             COMP_SHADER = self.compile_shader(COMP_SOURCE)
+        
+        if inputs['Auto Exposure'] <= 0.0:
+            outputs['Color'] = inputs['Color']
+            return
         
         self.render_shader(DR_SHADER, self.get_render_target('DR_1'),
             textures= {'tex': inputs['Color']},
@@ -133,6 +129,9 @@ class ToneMapper(CustomPipelineNode):
             textures= {
                 'color_tex': inputs['Color'], 
                 'dr_tex': self.get_output('DR_4', 'MAIN')
+            },
+            uniforms= {
+                'auto_exposure': inputs['Auto Exposure'],
             }
         )
 
